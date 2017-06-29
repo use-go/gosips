@@ -2,7 +2,7 @@ package header
 
 import (
 	"errors"
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 	"strconv"
 	"strings"
 )

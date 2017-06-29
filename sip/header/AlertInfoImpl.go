@@ -2,8 +2,8 @@ package header
 
 import (
 	"bytes"
-	"gosips/core"
-	"gosips/sip/address"
+	"github.com/sssgun/gosips/core"
+	"github.com/sssgun/gosips/sip/address"
 )
 
 /**

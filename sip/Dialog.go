@@ -10,9 +10,9 @@ package sip
 
 import (
 	"container/list"
-	"gosips/sip/address"
-	"gosips/sip/header"
-	"gosips/sip/message"
+	"github.com/sssgun/gosips/sip/address"
+	"github.com/sssgun/gosips/sip/header"
+	"github.com/sssgun/gosips/sip/message"
 )
 
 /**

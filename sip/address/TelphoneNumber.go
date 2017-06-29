@@ -3,7 +3,7 @@ package address
 import (
 	"bytes"
 	"container/list"
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 )
 
 /** Telephone number class.

@@ -1,6 +1,6 @@
 package header
 
-import "gosips/core"
+import "github.com/sssgun/gosips/core"
 
 /**
 * A Warning SIPObject. (A list of Warning headers).

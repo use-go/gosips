@@ -3,7 +3,7 @@ package address
 import (
 	"bytes"
 	"errors"
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 )
 
 /**

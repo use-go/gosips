@@ -1,6 +1,6 @@
 package header
 
-import "gosips/core"
+import "github.com/sssgun/gosips/core"
 
 /**
 * WWWAuthenticate SIPHeader (of which there can be several?)

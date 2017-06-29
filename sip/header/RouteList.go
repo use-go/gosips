@@ -1,6 +1,6 @@
 package header
 
-import "gosips/core"
+import "github.com/sssgun/gosips/core"
 
 /**
 * A list of Route Headers.

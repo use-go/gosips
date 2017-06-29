@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"gosips/core"
-	"gosips/sip/address"
+	"github.com/sssgun/gosips/core"
+	"github.com/sssgun/gosips/sip/address"
 	"strings"
 )
 

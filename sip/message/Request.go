@@ -1,7 +1,7 @@
 package message
 
 import (
-	"gosips/sip/address"
+	"github.com/sssgun/gosips/sip/address"
 )
 
 /**

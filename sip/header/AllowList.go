@@ -3,7 +3,7 @@ package header
 import (
 	"container/list"
 	"errors"
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 )
 
 /**

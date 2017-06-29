@@ -1,9 +1,9 @@
 package parser
 
 import (
-	"gosips/core"
-	"gosips/sip/address"
-	"gosips/sip/header"
+	"github.com/sssgun/gosips/core"
+	"github.com/sssgun/gosips/sip/address"
+	"github.com/sssgun/gosips/sip/header"
 )
 
 /** SIPParser for AlertInfo header.

@@ -1,6 +1,6 @@
 package parser
 
-import "gosips/sip/message"
+import "github.com/sssgun/gosips/sip/message"
 
 /**
 * A listener interface that enables customization of parse error handling.

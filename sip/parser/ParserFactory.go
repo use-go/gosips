@@ -2,7 +2,7 @@ package parser
 
 import (
 	"errors"
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 	"strings"
 )
 

@@ -3,10 +3,10 @@ package parser
 import (
 	"bytes"
 	"errors"
-	"gosips/core"
-	"gosips/sip/address"
-	"gosips/sip/header"
-	"gosips/sip/message"
+	"github.com/sssgun/gosips/core"
+	"github.com/sssgun/gosips/sip/address"
+	"github.com/sssgun/gosips/sip/header"
+	"github.com/sssgun/gosips/sip/message"
 	"strings"
 )
 

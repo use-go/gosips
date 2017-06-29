@@ -2,8 +2,8 @@ package parser
 
 import (
 	"bytes"
-	"gosips/core"
-	"gosips/sip/header"
+	"github.com/sssgun/gosips/core"
+	"github.com/sssgun/gosips/sip/header"
 	"strings"
 )
 

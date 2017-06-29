@@ -1,7 +1,7 @@
 package header
 
 import (
-	"gosips/core"
+	"github.com/sssgun/gosips/core"
 )
 
 /**
