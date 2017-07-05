@@ -1,6 +1,10 @@
 package rtp
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"log"
+)
 
 /** Represents an RTP RTPPacket.
  *  The RTPPacket class can be used to parse a RTPRawPacket instance if it represents RTP data.
@@ -19,18 +23,18 @@ type RTPPacket struct {
 /** Creates an RTPPacket instance based upon the data in \c rawpack, optionally installing a memory manager.
  *  If successful, the data is moved from the raw packet to the RTPPacket instance.
  */
-func NewRTPPacketFromRawPacket(rawpack *RawPacket) *RTPPacket {
+func NewRTPPacketFromRawPacket(rawpack *RawPacket) (*RTPPacket, error) {
 	this := &RTPPacket{}
 	this.receivetime = rawpack.GetReceiveTime().Clone()
 	if err := this.ParseRawPacket(rawpack); err != nil {
-		return nil
+		return nil, err
 	}
-	return this
+	return this, nil
 }
 
 func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 	if !rawpack.IsRTP() { // If we didn't receive it on the RTP port, we'll ignore it
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("is not RTP.")
 	}
 
 	this.packet = make([]byte, len(rawpack.GetData()))
@@ -43,7 +47,7 @@ func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 
 	// The version number should be correct
 	if this.header.version != RTP_VERSION {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return fmt.Errorf("invalid version. %d vs %d", this.header.version, RTP_VERSION)
 	}
 
 	// We'll check if this is possibly a RTCP packet. For this to be possible
@@ -51,10 +55,10 @@ func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 	// identifier
 	if this.header.marker != 0 {
 		if this.header.payloadtype == (RTP_RTCPTYPE_SR & 127) { // don't check high bit (this was the marker!!)
-			return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+			return errors.New("invalid payloadtype rtcp_sr.")
 		}
 		if this.header.payloadtype == (RTP_RTCPTYPE_RR & 127) {
-			return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+			return errors.New("invalid payloadtype rtcp_rr.")
 		}
 	}
 
@@ -74,7 +78,7 @@ func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 	if this.header.padding != 0 { // adjust payload length to take padding into account
 		numpadbytes = int(this.packet[len(this.packet)-1]) // last byte contains number of padding bytes
 		if numpadbytes > len(this.packet)-payloadoffset {
-			return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+			return errors.New("invalid padding.")
 		}
 	} else {
 		numpadbytes = 0
@@ -82,7 +86,7 @@ func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 
 	payloadlength = len(this.packet) - numpadbytes - payloadoffset
 	if payloadlength < 0 {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("invalid payload length.")
 	}
 
 	return nil
