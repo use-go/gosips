@@ -3,7 +3,6 @@ package rtp
 import (
 	"errors"
 	"fmt"
-	"log"
 )
 
 /** Represents an RTP RTPPacket.
