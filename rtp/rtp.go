@@ -1,6 +1,9 @@
 package rtp
 
-import "errors"
+import (
+	"errors"
+	"unsafe"
+)
 
 const RTP_VERSION = 2
 const RTP_MAXCSRCS = 15
@@ -31,7 +34,7 @@ const RTP_HEADER_CC_MSK = 0xF
 const RTP_HEADER_CC_POS = 4
 const RTP_HEADER_M_MSK = 0x1
 const RTP_HEADER_M_POS = 8
-const RTP_HEADER_PT_MSK = 0x7F
+const RTP_HEADER_PT_MSK = 0x7F //129
 const RTP_HEADER_PT_POS = 9
 
 const RTCP_HEADER_C_MSK = 0x1F
@@ -65,32 +68,65 @@ func NewRTPHeader() *RTPHeader {
 	return this
 }
 
-func NewRTPHeaderFromBytes(packetbytes []byte) *RTPHeader {
+func NewRTPHeaderFromBytes(packetbytes []byte) (*RTPHeader, error) {
 	this := &RTPHeader{}
+
 	if err := this.Parse(packetbytes); err != nil {
-		return nil
+		return nil, err
 	}
-	return this
+	return this, nil
+}
+
+const INT_SIZE int = int(unsafe.Sizeof(0))
+
+var (
+	bigEndian = int(-1)
+)
+
+func CheckEndian() {
+	if bigEndian == -1 {
+		var i int = 0x1
+		bs := (*[INT_SIZE]byte)(unsafe.Pointer(&i))
+		if bs[0] == 0 {
+			bigEndian = 1
+		} else {
+			bigEndian = 0
+		}
+	}
 }
 
 func (this *RTPHeader) Parse(packetbytes []byte) error {
 	if len(packetbytes) < SIZEOF_RTPHEADER {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("invalid rtp header size")
 	}
 
-	this.version = (packetbytes[0] >> RTP_HEADER_V_POS) & RTP_HEADER_V_MSK
-	this.padding = (packetbytes[0] >> RTP_HEADER_P_POS) & RTP_HEADER_P_MSK
-	this.extension = (packetbytes[0] >> RTP_HEADER_X_POS) & RTP_HEADER_X_MSK
-	this.csrccount = (packetbytes[0] >> RTP_HEADER_CC_POS) & RTP_HEADER_CC_MSK
-	this.marker = (packetbytes[1] >> RTP_HEADER_M_POS) & RTP_HEADER_M_MSK
-	this.payloadtype = (packetbytes[1] >> RTP_HEADER_PT_POS) & RTP_HEADER_PT_MSK
+	CheckEndian()
+	if bigEndian == 1 {
+		this.version = (packetbytes[0] >> RTP_HEADER_V_POS) & RTP_HEADER_V_MSK
+		this.padding = (packetbytes[0] >> RTP_HEADER_P_POS) & RTP_HEADER_P_MSK
+		this.extension = (packetbytes[0] >> RTP_HEADER_X_POS) & RTP_HEADER_X_MSK
+		this.csrccount = (packetbytes[0] >> RTP_HEADER_CC_POS) & RTP_HEADER_CC_MSK
+		this.marker = (packetbytes[1] >> RTP_HEADER_M_POS) & RTP_HEADER_M_MSK
+		this.payloadtype = (packetbytes[1] >> RTP_HEADER_PT_POS) & RTP_HEADER_PT_MSK
+		//log.Printf("BigEndian[%v]. RTP Version:%v, PT:%v", packetbytes[0:12], this.version, this.payloadtype)
+	} else {
+		this.version = (packetbytes[0] >> 6) & RTP_HEADER_V_MSK
+		this.padding = (packetbytes[0] >> 5) & RTP_HEADER_P_MSK
+		this.extension = (packetbytes[0] >> 4) & RTP_HEADER_X_MSK
+		this.csrccount = packetbytes[0] & 0x07
+		this.marker = (packetbytes[1] >> 7) & RTP_HEADER_M_MSK
+		this.payloadtype = packetbytes[1] & RTP_HEADER_PT_MSK
+		//this.header_size = 12 + 4 * this.csrccount
+		//this.payload_size = len(packetbytes) - this.header_size
+		//log.Printf("LittleEndian[%v]. RTP Version:%v, PT:%v", packetbytes[0:12], this.version, this.payloadtype)
+	}
 
 	this.sequencenumber = uint16(packetbytes[2])<<8 | uint16(packetbytes[3])
 	this.timestamp = uint32(packetbytes[4])<<24 | uint32(packetbytes[5])<<16 | uint32(packetbytes[6])<<8 | uint32(packetbytes[7])
 	this.ssrc = uint32(packetbytes[8])<<24 | uint32(packetbytes[9])<<16 | uint32(packetbytes[10])<<8 | uint32(packetbytes[11])
 
 	if len(packetbytes) < SIZEOF_RTPHEADER+int(this.csrccount)*4 {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("invalid rtp header size: error ccrc count")
 	}
 
 	this.csrc = make([]uint32, this.csrccount)
@@ -160,14 +196,14 @@ func NewRTPExtensionFromBytes(packetbytes []byte) *RTPExtension {
 
 func (this *RTPExtension) Parse(packetbytes []byte) error {
 	if len(packetbytes) < SIZEOF_RTPEXTENSION {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("invalid rtp extendsion header size")
 	}
 
 	this.id = uint16(packetbytes[0])<<8 | uint16(packetbytes[1])
 	this.length = uint16(packetbytes[2])<<8 | uint16(packetbytes[3])
 
 	if len(packetbytes) < SIZEOF_RTPEXTENSION+int(this.length)*4 {
-		return errors.New("ERR_RTP_PACKET_INVALIDPACKET")
+		return errors.New("invalid rtp extendsion header size. error id/length")
 	}
 
 	for i := uint16(0); i < this.length; i++ {
