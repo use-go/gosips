@@ -65,11 +65,15 @@ type RTPHeader struct {
 func NewRTPHeader() *RTPHeader {
 	this := &RTPHeader{}
 
+	CheckEndian()
+
 	return this
 }
 
 func NewRTPHeaderFromBytes(packetbytes []byte) (*RTPHeader, error) {
 	this := &RTPHeader{}
+
+	CheckEndian()
 
 	if err := this.Parse(packetbytes); err != nil {
 		return nil, err
@@ -95,12 +99,23 @@ func CheckEndian() {
 	}
 }
 
+/* helper, read a big-endian 16 bit int from memory */
+func rbe16(p []byte) int {
+	v := int(p[0]<<8 | p[1])
+	return v
+}
+
+/* helper, read a big-endian 32 bit int from memory */
+func rbe32(p []byte) int {
+	v := int(p[0]<<24 | p[1]<<16 | p[2]<<8 | p[3])
+	return v
+}
+
 func (this *RTPHeader) Parse(packetbytes []byte) error {
 	if len(packetbytes) < SIZEOF_RTPHEADER {
 		return errors.New("invalid rtp header size")
 	}
 
-	CheckEndian()
 	if bigEndian == 1 {
 		this.version = (packetbytes[0] >> RTP_HEADER_V_POS) & RTP_HEADER_V_MSK
 		this.padding = (packetbytes[0] >> RTP_HEADER_P_POS) & RTP_HEADER_P_MSK
@@ -143,13 +158,23 @@ func (this *RTPHeader) Encode() []byte {
 	var packetbytes []byte
 	packetbytes = make([]byte, SIZEOF_RTPHEADER+int(this.csrccount)*4)
 
-	packetbytes[0] = ((this.version & RTP_HEADER_V_MSK) << RTP_HEADER_V_POS) |
-		((this.padding & RTP_HEADER_P_MSK) << RTP_HEADER_P_POS) |
-		((this.extension & RTP_HEADER_X_MSK) << RTP_HEADER_X_POS) |
-		((this.csrccount & RTP_HEADER_CC_MSK) << RTP_HEADER_CC_POS)
+	if bigEndian == 1 {
+		packetbytes[0] = ((this.version & RTP_HEADER_V_MSK) << RTP_HEADER_V_POS) |
+			((this.padding & RTP_HEADER_P_MSK) << RTP_HEADER_P_POS) |
+			((this.extension & RTP_HEADER_X_MSK) << RTP_HEADER_X_POS) |
+			((this.csrccount & RTP_HEADER_CC_MSK) << RTP_HEADER_CC_POS)
 
-	packetbytes[1] = ((this.marker & RTP_HEADER_M_MSK) << RTP_HEADER_M_POS) |
-		((this.payloadtype & RTP_HEADER_PT_MSK) << RTP_HEADER_PT_POS)
+		packetbytes[1] = ((this.marker & RTP_HEADER_M_MSK) << RTP_HEADER_M_POS) |
+			((this.payloadtype & RTP_HEADER_PT_MSK) << RTP_HEADER_PT_POS)
+	} else {
+		packetbytes[0] = ((this.csrccount & RTP_HEADER_CC_MSK) << 0) |
+			((this.extension & RTP_HEADER_X_MSK) << 4) |
+			((this.padding & RTP_HEADER_P_MSK) << 5) |
+			((this.version & RTP_HEADER_V_MSK) << 6)
+
+		packetbytes[1] = ((this.payloadtype & RTP_HEADER_PT_MSK) << 0) |
+			((this.marker & RTP_HEADER_M_MSK) << 7)
+	}
 
 	packetbytes[2] = byte((this.sequencenumber >> 8) & 0xFF)
 	packetbytes[3] = byte(this.sequencenumber & 0xFF)
