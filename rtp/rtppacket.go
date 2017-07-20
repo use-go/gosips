@@ -23,67 +23,67 @@ type RTPPacket struct {
  *  If successful, the data is moved from the raw packet to the RTPPacket instance.
  */
 func NewRTPPacketFromRawPacket(rawpack *RawPacket) (*RTPPacket, error) {
-	this := &RTPPacket{}
-	this.receivetime = rawpack.GetReceiveTime().Clone()
-	if err := this.ParseRawPacket(rawpack); err != nil {
+	rp := &RTPPacket{}
+	rp.receivetime = rawpack.GetReceiveTime().Clone()
+	if err := rp.ParseRawPacket(rawpack); err != nil {
 		return nil, err
 	}
-	return this, nil
+	return rp, nil
 }
 
-func (this *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
+func (rp *RTPPacket) ParseRawPacket(rawpack *RawPacket) error {
 	if !rawpack.IsRTP() { // If we didn't receive it on the RTP port, we'll ignore it
 		return errors.New("is not RTP.")
 	}
 
-	this.packet = make([]byte, len(rawpack.GetData()))
-	copy(this.packet, rawpack.GetData())
+	rp.packet = make([]byte, len(rawpack.GetData()))
+	copy(rp.packet, rawpack.GetData())
 
-	this.header = NewRTPHeader()
-	if err := this.header.Parse(this.packet); err != nil {
+	rp.header = NewRTPHeader()
+	if err := rp.header.Parse(rp.packet); err != nil {
 		return err
 	}
 
 	// The version number should be correct
-	if this.header.version != RTP_VERSION {
-		return fmt.Errorf("invalid version. %d vs %d", this.header.version, RTP_VERSION)
+	if rp.header.version != RTP_VERSION {
+		return fmt.Errorf("invalid version. %d vs %d", rp.header.version, RTP_VERSION)
 	}
 
-	// We'll check if this is possibly a RTCP packet. For this to be possible
+	// We'll check if rp is possibly a RTCP packet. For rp to be possible
 	// the marker bit and payload type combined should be either an SR or RR
 	// identifier
-	if this.header.marker != 0 {
-		if this.header.payloadtype == (RTP_RTCPTYPE_SR & 127) { // don't check high bit (this was the marker!!)
+	if rp.header.marker != 0 {
+		if rp.header.payloadtype == (RTP_RTCPTYPE_SR & 127) { // don't check high bit (rp was the marker!!)
 			return errors.New("invalid payloadtype rtcp_sr.")
 		}
-		if this.header.payloadtype == (RTP_RTCPTYPE_RR & 127) {
+		if rp.header.payloadtype == (RTP_RTCPTYPE_RR & 127) {
 			return errors.New("invalid payloadtype rtcp_rr.")
 		}
 	}
 
 	var numpadbytes, payloadoffset, payloadlength int
 
-	payloadoffset = SIZEOF_RTPHEADER + 4*int(this.header.csrccount)
-	if this.header.extension != 0 { // got header extension
-		this.extension = NewRTPExtension()
-		if err := this.extension.Parse(this.packet[payloadoffset:]); err != nil {
+	payloadoffset = SIZEOF_RTPHEADER + 4*int(rp.header.csrccount)
+	if rp.header.extension != 0 { // got header extension
+		rp.extension = NewRTPExtension()
+		if err := rp.extension.Parse(rp.packet[payloadoffset:]); err != nil {
 			return err
 		}
-		payloadoffset += SIZEOF_RTPEXTENSION + 4*int(this.extension.length)
+		payloadoffset += SIZEOF_RTPEXTENSION + 4*int(rp.extension.length)
 	} else {
-		this.extension = nil
+		rp.extension = nil
 	}
 
-	if this.header.padding != 0 { // adjust payload length to take padding into account
-		numpadbytes = int(this.packet[len(this.packet)-1]) // last byte contains number of padding bytes
-		if numpadbytes > len(this.packet)-payloadoffset {
+	if rp.header.padding != 0 { // adjust payload length to take padding into account
+		numpadbytes = int(rp.packet[len(rp.packet)-1]) // last byte contains number of padding bytes
+		if numpadbytes > len(rp.packet)-payloadoffset {
 			return errors.New("invalid padding.")
 		}
 	} else {
 		numpadbytes = 0
 	}
 
-	payloadlength = len(this.packet) - numpadbytes - payloadoffset
+	payloadlength = len(rp.packet) - numpadbytes - payloadoffset
 	if payloadlength < 0 {
 		return errors.New("invalid payload length.")
 	}
@@ -109,10 +109,10 @@ func NewPacket(payloadtype uint8,
 	extensionid uint16,
 	extensionlen uint16,
 	extensiondata []uint32) *RTPPacket {
-	this := &RTPPacket{}
+	rp := &RTPPacket{}
 
-	this.receivetime = &RTPTime{0, 0}
-	if err := this.BuildPacket(payloadtype,
+	rp.receivetime = &RTPTime{0, 0}
+	if err := rp.BuildPacket(payloadtype,
 		payloaddata,
 		seqnr,
 		timestamp,
@@ -127,9 +127,9 @@ func NewPacket(payloadtype uint8,
 		return nil
 	}
 
-	return this
+	return rp
 }
-func (this *RTPPacket) BuildPacket(payloadtype uint8,
+func (rp *RTPPacket) BuildPacket(payloadtype uint8,
 	payloaddata []byte,
 	seqnr uint16,
 	timestamp uint32,
@@ -160,173 +160,168 @@ func (this *RTPPacket) BuildPacket(payloadtype uint8,
 		packetlength += int(extensionlen) * 4 //sizeof(uint32_t)*((size_t)
 	}
 	packetlength += len(payloaddata) //payloadlen;
-	this.packet = make([]byte, packetlength)
+	rp.packet = make([]byte, packetlength)
 
 	// Ok, now we'll just fill in...
-	this.header = NewRTPHeader()
-	this.header.version = RTP_VERSION
-	this.header.padding = 0
+	rp.header = NewRTPHeader()
+	rp.header.version = RTP_VERSION
+	rp.header.padding = 0
 	if gotextension {
-		this.header.extension = 1
+		rp.header.extension = 1
 	} else {
-		this.header.extension = 0
+		rp.header.extension = 0
 	}
-	this.header.csrccount = numcsrcs
+	rp.header.csrccount = numcsrcs
 	if gotmarker {
-		this.header.marker = 1
+		rp.header.marker = 1
 	} else {
-		this.header.marker = 0
+		rp.header.marker = 0
 	}
-	this.header.payloadtype = payloadtype & 127
-	this.header.sequencenumber = seqnr
-	this.header.timestamp = timestamp
-	this.header.ssrc = ssrc
+	rp.header.payloadtype = payloadtype & 127
+	rp.header.sequencenumber = seqnr
+	rp.header.timestamp = timestamp
+	rp.header.ssrc = ssrc
 	if numcsrcs != 0 {
-		this.header.csrc = make([]uint32, numcsrcs)
+		rp.header.csrc = make([]uint32, numcsrcs)
 		for i := uint8(0); i < numcsrcs; i++ {
-			this.header.csrc[i] = csrcs[i] //htonl(csrcs[i]);
+			rp.header.csrc[i] = csrcs[i] //htonl(csrcs[i]);
 		}
 	}
 
 	packetoffset = SIZEOF_RTPHEADER + int(numcsrcs)*4
-	copy(this.packet[0:packetoffset], this.header.Encode())
+	copy(rp.packet[0:packetoffset], rp.header.Encode())
 
 	if gotextension {
-		this.extension = NewRTPExtension()
-		this.extension.id = extensionid
-		this.extension.length = extensionlen //sizeof(uint32_t);
+		rp.extension = NewRTPExtension()
+		rp.extension.id = extensionid
+		rp.extension.length = extensionlen //sizeof(uint32_t);
 		if extensionlen != 0 {
-			this.extension.data = make([]uint32, extensionlen)
+			rp.extension.data = make([]uint32, extensionlen)
 			for i := uint16(0); i < extensionlen; i++ {
-				this.extension.data[i] = extensiondata[i]
+				rp.extension.data[i] = extensiondata[i]
 			}
 		}
-		copy(this.packet[packetoffset:packetoffset+SIZEOF_RTPEXTENSION+int(extensionlen)*4], this.extension.Encode())
+		copy(rp.packet[packetoffset:packetoffset+SIZEOF_RTPEXTENSION+int(extensionlen)*4], rp.extension.Encode())
 
 		packetoffset += SIZEOF_RTPEXTENSION + int(extensionlen)*4
 	} else {
-		this.extension = nil
+		rp.extension = nil
 	}
 
-	this.payload = make([]byte, len(payloaddata))
-	copy(this.payload, payloaddata)
-	copy(this.packet[packetoffset:packetoffset+len(payloaddata)], payloaddata)
+	rp.payload = make([]byte, len(payloaddata))
+	copy(rp.payload, payloaddata)
+	copy(rp.packet[packetoffset:packetoffset+len(payloaddata)], payloaddata)
 
 	return nil
 }
 
 /** Returns \c true if the RTP packet has a header extension and \c false otherwise. */
-func (this *RTPPacket) HasExtension() bool {
-	return this.header.extension != 0
+func (rp *RTPPacket) HasExtension() bool {
+	return rp.header.extension != 0
 }
 
 /** Returns \c true if the marker bit was set and \c false otherwise. */
-func (this *RTPPacket) HasMarker() bool {
-	return this.header.marker != 0
+func (rp *RTPPacket) HasMarker() bool {
+	return rp.header.marker != 0
 }
 
-/** Returns the number of CSRCs contained in this packet. */
-func (this *RTPPacket) GetCSRCCount() uint8 {
-	return this.header.csrccount
+/** Returns the number of CSRCs contained in rp packet. */
+func (rp *RTPPacket) GetCSRCCount() uint8 {
+	return rp.header.csrccount
 }
 
 /** Returns a specific CSRC identifier.
  *  Returns a specific CSRC identifier. The parameter \c num can go from 0 to GetCSRCCount()-1.
  */
-func (this *RTPPacket) GetCSRC(num uint8) uint32 {
-	if num >= this.header.csrccount {
+func (rp *RTPPacket) GetCSRC(num uint8) uint32 {
+	if num >= rp.header.csrccount {
 		return 0
 	}
 
-	return this.header.csrc[num]
+	return rp.header.csrc[num]
 }
 
 /** Returns the payload type of the packet. */
-func (this *RTPPacket) GetPayloadType() uint8 {
-	return this.header.payloadtype
+func (rp *RTPPacket) GetPayloadType() uint8 {
+	return rp.header.payloadtype
 }
 
 /** Returns the extended sequence number of the packet.
  *  Returns the extended sequence number of the packet. When the packet is just received,
  *  only the low $16$ bits will be set. The high 16 bits can be filled in later.
  */
-// func (this *RTPPacket) GetExtendedSequenceNumber() uint32 {
-// 	return this.extseqnr
+// func (rp *RTPPacket) GetExtendedSequenceNumber() uint32 {
+// 	return rp.extseqnr
 // }
 
-/** Returns the sequence number of this packet. */
-func (this *RTPPacket) GetSequenceNumber() uint16 {
-	return this.header.sequencenumber //uint16(this.extseqnr & 0x0000FFFF)
+/** Returns the sequence number of rp packet. */
+func (rp *RTPPacket) GetSequenceNumber() uint16 {
+	return rp.header.sequencenumber //uint16(rp.extseqnr & 0x0000FFFF)
 }
 
-/** Sets the extended sequence number of this packet to \c seq. */
-// func (this *RTPPacket) SetExtendedSequenceNumber(seq uint32) {
-// 	this.extseqnr = seq
+/** Sets the extended sequence number of rp packet to \c seq. */
+// func (rp *RTPPacket) SetExtendedSequenceNumber(seq uint32) {
+// 	rp.extseqnr = seq
 // }
 
-/** Returns the timestamp of this packet. */
-func (this *RTPPacket) GetTimestamp() uint32 {
-	return this.header.timestamp
+/** Returns the timestamp of rp packet. */
+func (rp *RTPPacket) GetTimestamp() uint32 {
+	return rp.header.timestamp
 }
 
-/** Returns the SSRC identifier stored in this packet. */
-func (this *RTPPacket) GetSSRC() uint32 {
-	return this.header.ssrc
+/** Returns the SSRC identifier stored in rp packet. */
+func (rp *RTPPacket) GetSSRC() uint32 {
+	return rp.header.ssrc
 }
 
 /** Returns a pointer to the actual payload data. */
-func (this *RTPPacket) GetPayload() []byte {
-	return this.payload
+func (rp *RTPPacket) GetPayload() []byte {
+	return rp.payload
 }
 
-/** If a header extension is present, this function returns the extension identifier. */
-func (this *RTPPacket) GetExtensionID() uint16 {
-	return this.extension.id
+/** If a header extension is present, rp function returns the extension identifier. */
+func (rp *RTPPacket) GetExtensionID() uint16 {
+	return rp.extension.id
 }
 
 /** Returns the length of the header extension data. */
-func (this *RTPPacket) GetExtensionLength() uint16 {
-	return this.extension.length
+func (rp *RTPPacket) GetExtensionLength() uint16 {
+	return rp.extension.length
 }
 
 /** Returns the header extension data. */
-func (this *RTPPacket) GetExtensionData() []uint32 {
-	return this.extension.data
+func (rp *RTPPacket) GetExtensionData() []uint32 {
+	return rp.extension.data
 }
 
-/** Returns the time at which this packet was received.
+/** Returns the time at which rp packet was received.
  *  When an RTPPacket instance is created from an RTPRawPacket instance, the raw packet's
  *  reception time is stored in the RTPPacket instance. This function then retrieves that
  *  time.
  */
-func (this *RTPPacket) GetReceiveTime() *RTPTime {
-	return this.receivetime
+func (rp *RTPPacket) GetReceiveTime() *RTPTime {
+	return rp.receivetime
 }
 
 /** Returns a pointer to the data of the entire packet. */
-func (this *RTPPacket) GetPacket() []byte {
-	return this.packet
+func (rp *RTPPacket) GetPacket() []byte {
+	return rp.packet
 }
 
-func (this *RTPPacket) Dump() {
-	/*int i;
-
-	printf("Payload type:                %d\n",(int)GetPayloadType());
-	printf("Extended sequence number:    0x%08x\n",GetExtendedSequenceNumber());
-	printf("Timestamp:                   0x%08x\n",GetTimestamp());
-	printf("SSRC:                        0x%08x\n",GetSSRC());
-	printf("Marker:                      %s\n",HasMarker()?"yes":"no");
-	printf("CSRC count:                  %d\n",GetCSRCCount());
-	for (i = 0 ; i < GetCSRCCount() ; i++)
-		printf("    CSRC[%02d]:                0x%08x\n",i,GetCSRC(i));
-	printf("Payload:                     %s\n",GetPayloadData());
-	printf("Payload length:              %d\n",GetPayloadLength());
-	printf("RTPPacket length:               %d\n",GetPacketLength());
-	printf("RTPExtension:                   %s\n",HasExtension()?"yes":"no");
-	if (HasExtension())
-	{
-		printf("    RTPExtension ID:            0x%04x\n",GetExtensionID());
-		printf("    RTPExtension data:          %s\n",GetExtensionData());
-		printf("    RTPExtension length:        %d\n",GetExtensionLength());
-	}*/
+func (rp *RTPPacket) Dump() string {
+	/*
+		log.Printf("Payload type:                %d\n", rp.GetPayloadType())
+		log.Printf("Sequence number:             0x%08x\n", rp.GetSequenceNumber())
+		log.Printf("Timestamp:                   0x%08x\n", rp.GetTimestamp())
+		log.Printf("SSRC:                        0x%08x\n", rp.GetSSRC())
+		log.Printf("CSRC count:                  %d\n", rp.GetCSRCCount())
+		for i := uint8(0); i < rp.GetCSRCCount(); i++ {
+			log.Printf("    CSRC[%02d]:                0x%08x\n", i, rp.GetCSRC(i))
+		}
+		if rp.HasExtension() {
+			log.Printf("    RTPExtension ID:            0x%04x\n", rp.GetExtensionID())
+			log.Printf("    RTPExtension length:        %d\n", rp.GetExtensionLength())
+		}
+	*/
+	return fmt.Sprintf("RTPPacket{\n\tMarker: %t\n\tPayloadType: %d\n\tSeq: %d\n\tTimestamp: %d\n\tSSRC: %d\n\tPayload length: %d\n}", rp.HasMarker(), rp.GetPayloadType(), rp.GetSequenceNumber(), rp.GetTimestamp(), rp.GetSSRC(), len(rp.GetPayload()))
 }
