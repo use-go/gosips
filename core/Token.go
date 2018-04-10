@@ -13,28 +13,28 @@ func NewToken(tvalue string, ttype int) *Token {
 	return &Token{tokenValue: tvalue, tokenType: ttype}
 }
 
-func (this *Token) GetTokenValue() string {
-	return this.tokenValue
+func (token *Token) GetTokenValue() string {
+	return token.tokenValue
 }
-func (this *Token) GetTokenType() int {
-	return this.tokenType
+func (token *Token) GetTokenType() int {
+	return token.tokenType
 }
-func (this *Token) SetTokenValue(tvalue string) {
-	this.tokenValue = tvalue
+func (token *Token) SetTokenValue(tvalue string) {
+	token.tokenValue = tvalue
 }
-func (this *Token) SetTokenType(ttype int) {
-	this.tokenType = ttype
-}
-
-func (this *Token) String() string {
-	return "tokenValue = " + this.tokenValue + " / tokenType = " + strconv.Itoa(this.tokenType)
+func (token *Token) SetTokenType(ttype int) {
+	token.tokenType = ttype
 }
 
-func (this *Token) Clone() interface{} {
+func (token *Token) String() string {
+	return "tokenValue = " + token.tokenValue + " / tokenType = " + strconv.Itoa(token.tokenType)
+}
+
+func (token *Token) Clone() interface{} {
 	retval := &Token{}
 
-	retval.tokenType = this.tokenType
-	retval.tokenValue = this.tokenValue
+	retval.tokenType = token.tokenType
+	retval.tokenValue = token.tokenValue
 
 	return retval
 }

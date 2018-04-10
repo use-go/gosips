@@ -34,15 +34,15 @@ func NewHost(hname string) *Host {
 		return nil
 	}
 
-	this := &Host{}
+	host := &Host{}
 
-	this.hostname = hname
-	if this.isIPv6Address(hname) {
-		this.addressType = IPV6ADDRESS
+	host.hostname = hname
+	if host.isIPv6Address(hname) {
+		host.addressType = IPV6ADDRESS
 	}
-	this.addressType = IPV4ADDRESS
+	host.addressType = IPV4ADDRESS
 
-	return this
+	return host
 }
 
 /** constructor
@@ -50,21 +50,21 @@ func NewHost(hname string) *Host {
  * @param addrType int to set
  */
 /*func NewHost2(name string, addrType int) *Host {
-    this := &Host{};
-    this.addressType = addrType
-    this.hostname = strings.ToLower(strings.TrimSpace(name))
-    return this;
+    host := &Host{};
+    host.addressType = addrType
+    host.hostname = strings.ToLower(strings.TrimSpace(name))
+    return host;
 }*/
 
 /**
  * Return the host name in encoded form.
  * @return String
  */
-func (this *Host) String() string {
-	if this.addressType == IPV6ADDRESS && !this.isIPv6Reference(this.hostname) {
-		return "[" + this.hostname + "]"
+func (host *Host) String() string {
+	if host.addressType == IPV6ADDRESS && !host.isIPv6Reference(host.hostname) {
+		return "[" + host.hostname + "]"
 	}
-	return this.hostname
+	return host.hostname
 }
 
 /**
@@ -74,8 +74,8 @@ func (this *Host) String() string {
  * @param obj Object to set
  * @return boolean
  */
-/*func (this *Host) equals(Object obj) bool{
-    if (!this.getClass().equals(obj.getClass())) {
+/*func (host *Host) equals(Object obj) bool{
+    if (!host.getClass().equals(obj.getClass())) {
         return false;
     }
     Host otherHost = (Host) obj;
@@ -86,15 +86,15 @@ func (this *Host) String() string {
 /** get the HostName field
  * @return String
  */
-func (this *Host) GetHostName() string {
-	return this.hostname
+func (host *Host) GetHostName() string {
+	return host.hostname
 }
 
 /** get the Address field
  * @return String
  */
-func (this *Host) GetAddress() string {
-	return this.hostname
+func (host *Host) GetAddress() string {
+	return host.hostname
 }
 
 /**
@@ -102,23 +102,23 @@ func (this *Host) GetAddress() string {
  * of a SIP message as a String.
  * @return String
  */
-func (this *Host) GetIpAddress() string {
+func (host *Host) GetIpAddress() string {
 	var rawIpAddress string
-	if this.hostname == "" {
+	if host.hostname == "" {
 		return ""
 	}
 
-	if this.addressType == HOSTNAME {
+	if host.addressType == HOSTNAME {
 		//try {
-		if this.inetAddress == nil {
-			this.inetAddress = net.ParseIP(this.hostname)
+		if host.inetAddress == nil {
+			host.inetAddress = net.ParseIP(host.hostname)
 		}
-		rawIpAddress = this.inetAddress.String() //getHostAddress();
+		rawIpAddress = host.inetAddress.String() //getHostAddress();
 		//} catch (UnknownHostException ex) {
 		//    dbgPrint("Could not resolve hostname " + ex);
 		//}
 	} else {
-		rawIpAddress = this.hostname
+		rawIpAddress = host.hostname
 	}
 	return rawIpAddress
 }
@@ -127,31 +127,31 @@ func (this *Host) GetIpAddress() string {
  * Set the hostname member.
  * @param h String to set
  */
-func (this *Host) SetHostName(hname string) {
-	this.inetAddress = nil
-	if this.isIPv6Address(hname) {
-		this.addressType = IPV6ADDRESS
+func (host *Host) SetHostName(hname string) {
+	host.inetAddress = nil
+	if host.isIPv6Address(hname) {
+		host.addressType = IPV6ADDRESS
 	} else {
-		this.addressType = HOSTNAME
+		host.addressType = HOSTNAME
 	}
 	// Null check bug fix sent in by jpaulo@ipb.pt
 	if hname != "" {
-		this.hostname = strings.ToLower(strings.TrimSpace(hname))
+		host.hostname = strings.ToLower(strings.TrimSpace(hname))
 	}
 }
 
 /** Set the IP Address.
  *@param address is the address string to set.
  */
-func (this *Host) SetHostAddress(address string) {
-	this.inetAddress = nil
-	if this.isIPv6Address(address) {
-		this.addressType = IPV6ADDRESS
+func (host *Host) SetHostAddress(address string) {
+	host.inetAddress = nil
+	if host.isIPv6Address(address) {
+		host.addressType = IPV6ADDRESS
 	} else {
-		this.addressType = IPV4ADDRESS
+		host.addressType = IPV4ADDRESS
 	}
 	if address != "" {
-		this.hostname = strings.TrimSpace(address)
+		host.hostname = strings.TrimSpace(address)
 	}
 }
 
@@ -159,41 +159,41 @@ func (this *Host) SetHostAddress(address string) {
  * Set the address member
  * @param address address String to set
  */
-func (this *Host) SetAddress(address string) {
-	this.SetHostAddress(address)
+func (host *Host) SetAddress(address string) {
+	host.SetHostAddress(address)
 }
 
 /** Return true if the address is a DNS host name
  *  (and not an IPV4 address)
  *@return true if the hostname is a DNS name
  */
-func (this *Host) IsHostName() bool {
-	return this.addressType == HOSTNAME
+func (host *Host) IsHostName() bool {
+	return host.addressType == HOSTNAME
 }
 
 /** Return true if the address is a DNS host name
  *  (and not an IPV4 address)
  *@return true if the hostname is host address.
  */
-func (this *Host) IsIPAddress() bool {
-	return this.addressType != HOSTNAME
+func (host *Host) IsIPAddress() bool {
+	return host.addressType != HOSTNAME
 }
 
-/** Get the inet address from this host.
+/** Get the inet address from host host.
  * Caches the inet address returned from dns lookup to avoid
  * lookup delays.
  *
  *@throws UnkownHostexception when the host name cannot be resolved.
  */
-func (this *Host) GetInetAddress() net.IP {
-	if this.hostname == "" {
+func (host *Host) GetInetAddress() net.IP {
+	if host.hostname == "" {
 		return nil
 	}
-	if this.inetAddress != nil {
-		return this.inetAddress
+	if host.inetAddress != nil {
+		return host.inetAddress
 	}
-	this.inetAddress = net.ParseIP(this.hostname)
-	return this.inetAddress
+	host.inetAddress = net.ParseIP(host.hostname)
+	return host.inetAddress
 
 }
 
@@ -202,7 +202,7 @@ func (this *Host) GetInetAddress() net.IP {
  * Verifies whether the <code>address</code> could
  * be an IPv6 address
  */
-func (this *Host) isIPv6Address(address string) bool {
+func (host *Host) isIPv6Address(address string) bool {
 	return address != "" && strings.Index(address, ":") != -1
 }
 
@@ -210,13 +210,13 @@ func (this *Host) isIPv6Address(address string) bool {
  * Verifies whether the ipv6reference, i.e. whether it enclosed in
  * square brackets
  */
-func (this *Host) isIPv6Reference(address string) bool {
+func (host *Host) isIPv6Reference(address string) bool {
 	return address[0] == '[' && address[len(address)-1] == ']'
 }
 
-func (this *Host) Clone() interface{} {
+func (host *Host) Clone() interface{} {
 	retval := &Host{}
-	retval.addressType = this.addressType
-	retval.hostname = this.hostname
+	retval.addressType = host.addressType
+	retval.hostname = host.hostname
 	return retval
 }

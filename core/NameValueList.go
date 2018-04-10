@@ -7,7 +7,7 @@ import (
 
 /**
 * Implements a simple NameValue association with a quick lookup
-* function (via a hash table) this class is not thread safe
+* function (via a hash table) nameValueList class is not thread safe
 * because it uses HashTables.
  */
 
@@ -21,42 +21,42 @@ type NameValueList struct {
 }
 
 func NewNameValueList(listName string) *NameValueList {
-	this := &NameValueList{}
+	listname := &NameValueList{}
 
-	this.listName = listName
-	this.separator = ";"
+	listname.listName = listName
+	listname.separator = ";"
 
-	return this
+	return listname
 }
 
-func (this *NameValueList) GetIndentation() string {
+func (nameValueList *NameValueList) GetIndentation() string {
 	var retval bytes.Buffer
-	for i := 0; i < this.indentation; i++ {
+	for i := 0; i < nameValueList.indentation; i++ {
 		retval.WriteString(" ")
 	}
 	return retval.String()
 }
 
-/*func (this *NameValueList) ConcatenateToTail(nvl *NameValueList) {
-    this.Concatenate(objList, false)
+/*func (nameValueList *NameValueList) ConcatenateToTail(nvl *NameValueList) {
+    nameValueList.Concatenate(objList, false)
 }*/
 
-func (this *NameValueList) Concatenate(nvl *NameValueList, topFlag bool) {
+func (nameValueList *NameValueList) Concatenate(nvl *NameValueList, topFlag bool) {
 	if nvl == nil {
 		return
 	}
 
 	if !topFlag {
-		//this.PushBackList(nvl)
+		//nameValueList.PushBackList(nvl)
 		for e := nvl.Front(); e != nil; e = e.Next() {
-		    this.PushBack(e)
+		    nameValueList.PushBack(e)
 		}
 	} else {
-		//this.PushFrontList(nvl)
+		//nameValueList.PushFrontList(nvl)
 		// add given items to the end of the list.
-		first := this.Front() 
+		first := nameValueList.Front()
 		for e := nvl.Front(); e != nil; e = e.Next() {
-		    this.InsertBefore(e, first)
+		    nameValueList.InsertBefore(e, first)
 		}
 	}
 }
@@ -65,42 +65,42 @@ func (this *NameValueList) Concatenate(nvl *NameValueList, topFlag bool) {
  * string formatting function.
  */
 
-func (this *NameValueList) Sprint(s string) {
+func (nameValueList *NameValueList) Sprint(s string) {
 	if s == "" {
-		this.stringRep += this.GetIndentation()
-		this.stringRep += "<null>\n"
+		nameValueList.stringRep += nameValueList.GetIndentation()
+		nameValueList.stringRep += "<null>\n"
 		return
 	}
 
 	if s == "}" || s == "]" {
-		this.indentation--
+		nameValueList.indentation--
 	}
-	this.stringRep += this.GetIndentation()
-	this.stringRep += s
-	this.stringRep += "\n"
+	nameValueList.stringRep += nameValueList.GetIndentation()
+	nameValueList.stringRep += s
+	nameValueList.stringRep += "\n"
 	if s == "{" || s == "[" {
-		this.indentation++
+		nameValueList.indentation++
 	}
 }
 
 /**
          * Encode the list in semicolon separated form.
-	 * @return an encoded string containing the objects in this list.
+	 * @return an encoded string containing the objects in nameValueList list.
          * @since v1.0
 */
-func (this *NameValueList) String() string {
-	if this.Len() == 0 {
+func (nameValueList *NameValueList) String() string {
+	if nameValueList.Len() == 0 {
 		return ""
 	}
 
 	var encoding bytes.Buffer //= new StringBuffer();
-	for e := this.Front(); e != nil; e = e.Next() {
+	for e := nameValueList.Front(); e != nil; e = e.Next() {
 		nv := e.Value.(*NameValue)
 		encoding.WriteString(nv.String())
 
 		if e.Next() != nil {
-			//println(this.separator);
-			encoding.WriteString(this.separator)
+			//println(nameValueList.separator);
+			encoding.WriteString(nameValueList.separator)
 		}
 
 	}
@@ -113,40 +113,40 @@ func (this *NameValueList) String() string {
  * @since v1.0
  * @param sep is the new seperator (default is semicolon)
  */
-func (this *NameValueList) SetSeparator(sep string) {
-	this.separator = sep
+func (nameValueList *NameValueList) SetSeparator(sep string) {
+	nameValueList.separator = sep
 }
 
-func (this *NameValueList) AddNameValue(nv *NameValue) {
+func (nameValueList *NameValueList) AddNameValue(nv *NameValue) {
 	if nv == nil {
 		//throw new NullPointerException("null nv");
 		return
 	}
-	this.PushBack(nv)
+	nameValueList.PushBack(nv)
 }
 
 /**
-* Add a name value record to this list.
+* Add a name value record to nameValueList list.
  */
-func (this *NameValueList) AddNameAndValue(name string, value interface{}) {
+func (nameValueList *NameValueList) AddNameAndValue(name string, value interface{}) {
 	nv := NewNameValue(name, value)
-	this.AddNameValue(nv)
+	nameValueList.AddNameValue(nv)
 }
 
 /**
-* Set a namevalue object in this list.
+* Set a namevalue object in nameValueList list.
  */
-func (this *NameValueList) SetNameValue(nv *NameValue) {
-	this.Delete(nv.name)
-	this.AddNameValue(nv)
+func (nameValueList *NameValueList) SetNameValue(nv *NameValue) {
+	nameValueList.Delete(nv.name)
+	nameValueList.AddNameValue(nv)
 }
 
 /**
-* Set a namevalue object in this list.
+* Set a namevalue object in nameValueList list.
  */
-func (this *NameValueList) SetNameAndValue(name string, value interface{}) {
+func (nameValueList *NameValueList) SetNameAndValue(name string, value interface{}) {
 	nv := NewNameValue(name, value)
-	this.SetNameValue(nv)
+	nameValueList.SetNameValue(nv)
 }
 
 /**
@@ -156,15 +156,15 @@ func (this *NameValueList) SetNameAndValue(name string, value interface{}) {
 */
 /*public boolean equals(Object otherObject) {
             if (!otherObject.getClass().equals
-                (this.getClass())) {
+                (nameValueList.getClass())) {
                 return false;
             }
             NameValueList other = (NameValueList) otherObject;
 
-            if (this.size() != other.size()) {
+            if (nameValueList.size() != other.size()) {
 		return false;
 	    }
-	    ListIterator li = this.listIterator();
+	    ListIterator li = nameValueList.listIterator();
 
 	    while (li.hasNext()) {
 		NameValue nv = (NameValue) li.next();
@@ -186,8 +186,8 @@ func (this *NameValueList) SetNameAndValue(name string, value interface{}) {
 /**
 *  Do a lookup on a given name and return value associated with it.
  */
-func (this *NameValueList) GetValue(name string) interface{} {
-	nv := this.GetNameValue(name)
+func (nameValueList *NameValueList) GetValue(name string) interface{} {
+	nv := nameValueList.GetNameValue(name)
 	if nv != nil {
 		return nv.value
 	}
@@ -199,8 +199,8 @@ func (this *NameValueList) GetValue(name string) interface{} {
 * Get the NameValue record given a name.
 * @since 1.0
  */
-func (this *NameValueList) GetNameValue(name string) *NameValue {
-	for e := this.Front(); e != nil; e = e.Next() {
+func (nameValueList *NameValueList) GetNameValue(name string) *NameValue {
+	for e := nameValueList.Front(); e != nil; e = e.Next() {
 		nv := e.Value.(*NameValue)
 		if nv.GetName() == name {
 			return nv
@@ -211,23 +211,23 @@ func (this *NameValueList) GetNameValue(name string) *NameValue {
 }
 
 /**
-* Returns a boolean telling if this NameValueList
-* has a record with this name
+* Returns a boolean telling if nameValueList NameValueList
+* has a record with nameValueList name
 * @since 1.0
  */
-func (this *NameValueList) HasNameValue(name string) bool {
-	return this.GetNameValue(name) != nil
+func (nameValueList *NameValueList) HasNameValue(name string) bool {
+	return nameValueList.GetNameValue(name) != nil
 }
 
 /**
-* Remove the element corresponding to this name.
+* Remove the element corresponding to nameValueList name.
 * @since 1.0
  */
-func (this *NameValueList) Delete(name string) bool {
-	for e := this.Front(); e != nil; e = e.Next() {
+func (nameValueList *NameValueList) Delete(name string) bool {
+	for e := nameValueList.Front(); e != nil; e = e.Next() {
 		nv := e.Value.(*NameValue)
 		if nv.GetName() == name {
-			this.Remove(e)
+			nameValueList.Remove(e)
 			return true
 		}
 	}
@@ -239,24 +239,24 @@ func (this *NameValueList) Delete(name string) bool {
  *Get a list of parameter names.
  *@return a list iterator that has the names of the parameters.
  */
-func (this *NameValueList) GetNames() *list.List {
+func (nameValueList *NameValueList) GetNames() *list.List {
 	ll := list.New()
-	for e := this.Front(); e != nil; e = e.Next() {
+	for e := nameValueList.Front(); e != nil; e = e.Next() {
 		nv := e.Value.(*NameValue)
 		ll.PushBack(nv.GetName())
 	}
 	return ll
 }
 
-func (this *NameValueList) Clone() interface{} {
+func (nameValueList *NameValueList) Clone() interface{} {
 	retval := &NameValueList{}
-	retval.indentation = this.indentation
-	retval.listName = this.listName
-	retval.stringRep = this.stringRep
-	retval.separator = this.separator
+	retval.indentation = nameValueList.indentation
+	retval.listName = nameValueList.listName
+	retval.stringRep = nameValueList.stringRep
+	retval.separator = nameValueList.separator
 
 	li := list.New()
-	for e := this.Front(); e != nil; e = e.Next() {
+	for e := nameValueList.Front(); e != nil; e = e.Next() {
 		nv := e.Value.(*NameValue)
 		nnv := nv.Clone().(*NameValue)
 		li.PushBack(nnv)
@@ -268,8 +268,8 @@ func (this *NameValueList) Clone() interface{} {
 /** Get the parameter as a String.
  *@return the parameter as a string.
  */
-func (this *NameValueList) GetParameter(name string) string {
-	val := this.GetValue(name)
+func (nameValueList *NameValueList) GetParameter(name string) string {
+	val := nameValueList.GetValue(name)
 	if val == nil {
 		return ""
 	}

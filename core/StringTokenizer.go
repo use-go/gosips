@@ -6,50 +6,52 @@ import (
 	"strings"
 )
 
-/** Base string token splitter.
- */
+
+// StringTokenizer Base string token splitter.
 type StringTokenizer struct {
 	buffer   string
 	ptr      int
 	savedPtr int
 }
 
+// NewStringTokenizer for string
 func NewStringTokenizer(buffer string) *StringTokenizer {
-	this := &StringTokenizer{}
-	this.buffer = buffer
-	this.ptr = 0
+	stringTokenizer := &StringTokenizer{}
+	stringTokenizer.buffer = buffer
+	stringTokenizer.ptr = 0
 
-	return this
+	return stringTokenizer
 }
 
-func (this *StringTokenizer) super(buffer string) {
-	this.buffer = buffer
-	this.ptr = 0
+func (stringtokenizer *StringTokenizer) super(buffer string) {
+	stringtokenizer.buffer = buffer
+	stringtokenizer.ptr = 0
 }
 
-func (this *StringTokenizer) NextToken() string {
+// NextToken for string
+func (stringtokenizer *StringTokenizer) NextToken() string {
 	var retval bytes.Buffer
 
-	for this.ptr < len(this.buffer) {
-		if this.buffer[this.ptr] == '\n' {
-			retval.WriteByte(this.buffer[this.ptr])
-			this.ptr++
+	for stringtokenizer.ptr < len(stringtokenizer.buffer) {
+		if stringtokenizer.buffer[stringtokenizer.ptr] == '\n' {
+			retval.WriteByte(stringtokenizer.buffer[stringtokenizer.ptr])
+			stringtokenizer.ptr++
 			break
 		} else {
-			retval.WriteByte(this.buffer[this.ptr])
-			this.ptr++
+			retval.WriteByte(stringtokenizer.buffer[stringtokenizer.ptr])
+			stringtokenizer.ptr++
 		}
 	}
 
 	return retval.String()
 }
 
-func (this *StringTokenizer) HasMoreChars() bool {
-	return this.ptr < len(this.buffer)
+func (stringtokenizer *StringTokenizer) HasMoreChars() bool {
+	return stringtokenizer.ptr < len(stringtokenizer.buffer)
 }
 
-func (this *StringTokenizer) IsHexDigit(ch byte) bool {
-	if this.IsDigit(ch) {
+func (stringtokenizer *StringTokenizer) IsHexDigit(ch byte) bool {
+	if stringtokenizer.IsDigit(ch) {
 		return true
 	}
 	ch1 := strings.ToUpper(string(ch))[0]
@@ -58,96 +60,92 @@ func (this *StringTokenizer) IsHexDigit(ch byte) bool {
 
 }
 
-func (this *StringTokenizer) IsAlpha(ch byte) bool {
+func (stringtokenizer *StringTokenizer) IsAlpha(ch byte) bool {
 	return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
 }
 
-func (this *StringTokenizer) IsDigit(ch byte) bool {
+func (stringtokenizer *StringTokenizer) IsDigit(ch byte) bool {
 	return ch == '0' || ch == '1' || ch == '2' || ch == '3' || ch == '4' ||
 		ch == '5' || ch == '6' || ch == '7' || ch == '8' || ch == '9'
 }
 
-func (this *StringTokenizer) GetLine() string {
+func (stringtokenizer *StringTokenizer) GetLine() string {
 	var retval bytes.Buffer
-	for this.ptr < len(this.buffer) && this.buffer[this.ptr] != '\n' {
-		retval.WriteByte(this.buffer[this.ptr])
-		this.ptr++
+	for stringtokenizer.ptr < len(stringtokenizer.buffer) && stringtokenizer.buffer[stringtokenizer.ptr] != '\n' {
+		retval.WriteByte(stringtokenizer.buffer[stringtokenizer.ptr])
+		stringtokenizer.ptr++
 	}
-	if this.ptr < len(this.buffer) && this.buffer[this.ptr] == '\n' {
+	if stringtokenizer.ptr < len(stringtokenizer.buffer) && stringtokenizer.buffer[stringtokenizer.ptr] == '\n' {
 		retval.WriteString("\n")
-		this.ptr++
+		stringtokenizer.ptr++
 	}
 	return retval.String()
 }
 
-func (this *StringTokenizer) PeekLine() string {
-	curPos := this.ptr
-	retval := this.GetLine()
-	this.ptr = curPos
+func (stringtokenizer *StringTokenizer) PeekLine() string {
+	curPos := stringtokenizer.ptr
+	retval := stringtokenizer.GetLine()
+	stringtokenizer.ptr = curPos
 	return retval
 }
 
-func (this *StringTokenizer) LookAhead() (byte, error) {
-	return this.LookAheadK(0)
+func (stringtokenizer *StringTokenizer) LookAhead() (byte, error) {
+	return stringtokenizer.LookAheadK(0)
 }
 
-func (this *StringTokenizer) LookAheadK(k int) (byte, error) {
-	if this.ptr+k < len(this.buffer) {
-		return this.buffer[this.ptr+k], nil
+func (stringtokenizer *StringTokenizer) LookAheadK(k int) (byte, error) {
+	if stringtokenizer.ptr+k < len(stringtokenizer.buffer) {
+		return stringtokenizer.buffer[stringtokenizer.ptr+k], nil
 	}
 	return 0, errors.New("StringTokenizer::LookAheadK: End of buffer")
 }
 
-func (this *StringTokenizer) GetNextChar() (byte, error) {
-	if this.ptr >= len(this.buffer) {
+func (stringtokenizer *StringTokenizer) GetNextChar() (byte, error) {
+	if stringtokenizer.ptr >= len(stringtokenizer.buffer) {
 		return 0, errors.New("StringTokenizer::GetNextChar: End of buffer")
 	}
-	ch := this.buffer[this.ptr]
-	this.ptr++
+	ch := stringtokenizer.buffer[stringtokenizer.ptr]
+	stringtokenizer.ptr++
 	return ch, nil
 }
 
-func (this *StringTokenizer) Consume() {
-	this.ptr = this.savedPtr
+func (stringtokenizer *StringTokenizer) Consume() {
+	stringtokenizer.ptr = stringtokenizer.savedPtr
 }
 
-func (this *StringTokenizer) ConsumeK(k int) {
-	this.ptr += k
+func (stringtokenizer *StringTokenizer) ConsumeK(k int) {
+	stringtokenizer.ptr += k
 }
 
-/** Get a Vector of the buffer tokenized by lines
- */
-func (this *StringTokenizer) GetLines() map[int]string {
+// GetLines Get a Vector of the buffer tokenized by lines
+func (stringtokenizer *StringTokenizer) GetLines() map[int]string {
 	result := make(map[int]string)
-	for this.HasMoreChars() {
-		line := this.GetLine()
+	for stringtokenizer.HasMoreChars() {
+		line := stringtokenizer.GetLine()
 		result[len(result)] = line
 	}
 	return result
 }
 
-/** Get the next token from the buffer.
- */
-func (this *StringTokenizer) GetNextTokenByDelim(delim byte) (string, error) {
+// GetNextTokenByDelim  Get the next token from the buffer.
+func (stringtokenizer *StringTokenizer) GetNextTokenByDelim(delim byte) (string, error) {
 	var retval bytes.Buffer
 	for {
-		la, err := this.LookAheadK(0)
+		la, err := stringtokenizer.LookAheadK(0)
 		if err != nil {
 			return "", err
 		}
 		if la == delim {
 			break
 		}
-		retval.WriteByte(this.buffer[this.ptr])
-		this.ConsumeK(1)
+		retval.WriteByte(stringtokenizer.buffer[stringtokenizer.ptr])
+		stringtokenizer.ConsumeK(1)
 	}
 	return retval.String(), nil
 }
 
-/** get the SDP field name of the line
- *  @return String
- */
-func (this *StringTokenizer) GetSDPFieldName(line string) string {
+// GetSDPFieldName  String
+func (stringtokenizer *StringTokenizer) GetSDPFieldName(line string) string {
 	if line == "" {
 		return ""
 	}

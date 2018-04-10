@@ -15,92 +15,92 @@ func NewNameValue(n string, v interface{}) *NameValue {
 		}
 	}
 
-	this := &NameValue{}
+	nameValue := &NameValue{}
 
-	this.name = n
-	this.value = v
-	this.separator = SIPSeparatorNames_EQUALS
-	this.quotes = ""
+	nameValue.name = n
+	nameValue.value = v
+	nameValue.separator = SIPSeparatorNames_EQUALS
+	nameValue.quotes = ""
 
-	return this
+	return nameValue
 }
 
 /**
 * Set the separator for the encoding method below.
  */
-func (this *NameValue) SetSeparator(sep string) {
-	this.separator = sep
+func (nameValue *NameValue) SetSeparator(sep string) {
+	nameValue.separator = sep
 }
 
 /** A flag that indicates that doublequotes should be put around the
 * value when encoded
 *(for example name=value when value is doublequoted).
  */
-func (this *NameValue) SetQuotedValue() {
-	this.isQuotedString = true
-	this.quotes = SIPSeparatorNames_DOUBLE_QUOTE
+func (nameValue *NameValue) SetQuotedValue() {
+	nameValue.isQuotedString = true
+	nameValue.quotes = SIPSeparatorNames_DOUBLE_QUOTE
 }
 
 /** Return true if the value is quoted in doublequotes.
  */
-func (this *NameValue) IsValueQuoted() bool {
-	return this.isQuotedString
+func (nameValue *NameValue) IsValueQuoted() bool {
+	return nameValue.isQuotedString
 }
 
-func (this *NameValue) GetName() string {
-	return this.name
+func (nameValue *NameValue) GetName() string {
+	return nameValue.name
 }
 
-func (this *NameValue) GetValue() interface{} {
-	return this.value
+func (nameValue *NameValue) GetValue() interface{} {
+	return nameValue.value
 }
 
 /**
 * Set the name member
  */
-func (this *NameValue) SetName(n string) {
-	this.name = n
+func (nameValue *NameValue) SetName(n string) {
+	nameValue.name = n
 }
 
 /**
 * Set the value member
  */
-func (this *NameValue) SetValue(v interface{}) {
+func (nameValue *NameValue) SetValue(v interface{}) {
 	if v != nil {
 		if _, ok := v.(string); !ok {
 			panic("value must be nil or string type")
 		}
 	}
-	this.value = v
+	nameValue.value = v
 }
 
 /**
-	* Get the encoded representation of this namevalue object.
+	* Get the encoded representation of nameValue namevalue object.
         * Added doublequote for encoding doublequoted values
 	* (bug reported by Kirby Kiem).
 	*@since 1.0
 	*@return an encoded name value (eg. name=value) string.
 */
-func (this *NameValue) String() string {
-	if this.name != "" && this.value != nil {
-		return this.name + this.separator + this.quotes + this.value.(string) + this.quotes
-	} else if this.name == "" && this.value != nil {
-		return this.quotes + this.value.(string) + this.quotes
-	} else if this.name != "" && this.value == nil {
-		return this.name
+func (nameValue *NameValue) String() string {
+	if nameValue.name != "" && nameValue.value != nil {
+		return nameValue.name + nameValue.separator + nameValue.quotes + nameValue.value.(string) + nameValue.quotes
+	} else if nameValue.name == "" && nameValue.value != nil {
+		return nameValue.quotes + nameValue.value.(string) + nameValue.quotes
+	} else if nameValue.name != "" && nameValue.value == nil {
+		return nameValue.name
 	} else {
 		return ""
 	}
 }
 
-func (this *NameValue) Clone() interface{} {
+func (nameValue *NameValue) Clone() interface{} {
 	retval := &NameValue{}
-	retval.separator = this.separator
-	retval.isQuotedString = this.isQuotedString
-	retval.quotes = this.quotes
-	retval.name = this.name
-	if this.value != nil {
-		retval.value = this.value.(string)
+	retval.separator = nameValue.separator
+	retval.isQuotedString = nameValue.isQuotedString
+	retval.quotes = nameValue.quotes
+	retval.name = nameValue.name
+	if nameValue.value != nil {
+		retval.value = nameValue.value.(string)
 	}
 	return retval
 }
@@ -109,23 +109,23 @@ func (this *NameValue) Clone() interface{} {
 * Equality comparison predicate.
  */
 /*public boolean equals( Object other) {
-	if (! other.getClass().equals(this.getClass()))  return false;
+	if (! other.getClass().equals(nameValue.getClass()))  return false;
         NameValue that = (NameValue) other;
-	if (this == that) return true;
-	if (this.name  == null && that.name != null ||
-	   this.name != null && that.name == null) return false;
-	if (this.name != null && that.name != null &&
-		this.name.compareToIgnoreCase(that.name) != 0)
+	if (nameValue == that) return true;
+	if (nameValue.name  == null && that.name != null ||
+	   nameValue.name != null && that.name == null) return false;
+	if (nameValue.name != null && that.name != null &&
+		nameValue.name.compareToIgnoreCase(that.name) != 0)
 			return false;
-	if ( this.value != null && that.value == null ||
-	     this.value == null && that.value != null) return false;
-	if (this.value == that.value) return true;
+	if ( nameValue.value != null && that.value == null ||
+	     nameValue.value == null && that.value != null) return false;
+	if (nameValue.value == that.value) return true;
 	if (value instanceof String) {
 		// Quoted string comparisions are case sensitive.
 	        if (isQuotedString)
-			return this.value.equals(that.value);
-		String val = (String) this.value;
+			return nameValue.value.equals(that.value);
+		String val = (String) nameValue.value;
 		String val1 = (String) that.value;
 		return val.compareToIgnoreCase(val1) == 0 ;
-	} else return this.value.equals(that.value);
+	} else return nameValue.value.equals(that.value);
 }*/

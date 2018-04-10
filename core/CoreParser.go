@@ -3,7 +3,7 @@ package core
 import "bytes"
 
 /** Generic parser class.
-* All parsers inherit this class.
+* All parsers inherit coreParser class.
  */
 type CoreParser struct {
 	nesting_level int
@@ -12,54 +12,54 @@ type CoreParser struct {
 }
 
 func NewCoreParser(buffer string) *CoreParser {
-	this := &CoreParser{}
+	coreParser := &CoreParser{}
 
-	this.lexer = NewCoreLexer("CharLexer", buffer)
+	coreParser.lexer = NewCoreLexer("CharLexer", buffer)
 
-	return this
+	return coreParser
 }
 
-func (this *CoreParser) Super(buffer string) {
-	this.lexer = NewCoreLexer("CharLexer", buffer)
+func (coreParser *CoreParser) Super(buffer string) {
+	coreParser.lexer = NewCoreLexer("CharLexer", buffer)
 }
 
-func (this *CoreParser) GetLexer() Lexer {
-	return this.lexer
+func (coreParser *CoreParser) GetLexer() Lexer {
+	return coreParser.lexer
 }
-func (this *CoreParser) SetLexer(lexer Lexer) {
-	this.lexer = lexer
+func (coreParser *CoreParser) SetLexer(lexer Lexer) {
+	coreParser.lexer = lexer
 }
 
-func (this *CoreParser) NameValue(separator byte) (nv *NameValue, ParseException error) {
+func (coreParser *CoreParser) NameValue(separator byte) (nv *NameValue, ParseException error) {
 	if Debug.ParserDebug {
-		this.Dbg_enter("nameValue")
-		defer this.Dbg_leave("nameValue")
+		coreParser.Dbg_enter("nameValue")
+		defer coreParser.Dbg_leave("nameValue")
 	}
 
-	if _, ParseException = this.lexer.Match(CORELEXER_ID); ParseException != nil {
+	if _, ParseException = coreParser.lexer.Match(CORELEXER_ID); ParseException != nil {
 		return nil, ParseException
 	}
-	name := this.lexer.GetNextToken()
+	name := coreParser.lexer.GetNextToken()
 
 	// eat white space.
-	this.lexer.SPorHT()
+	coreParser.lexer.SPorHT()
 
 	quoted := false
-	la, err := this.lexer.LookAheadK(0)
+	la, err := coreParser.lexer.LookAheadK(0)
 	if la == separator && err == nil {
-		this.lexer.ConsumeK(1)
-		this.lexer.SPorHT()
+		coreParser.lexer.ConsumeK(1)
+		coreParser.lexer.SPorHT()
 
 		var str string
 
-		if la, err = this.lexer.LookAheadK(0); la == '"' && err == nil {
-			str, _ = this.lexer.QuotedString()
+		if la, err = coreParser.lexer.LookAheadK(0); la == '"' && err == nil {
+			str, _ = coreParser.lexer.QuotedString()
 			quoted = true
 		} else {
-			if _, ParseException = this.lexer.Match(CORELEXER_ID); ParseException != nil {
+			if _, ParseException = coreParser.lexer.Match(CORELEXER_ID); ParseException != nil {
 				return nil, ParseException
 			}
-			value := this.lexer.GetNextToken()
+			value := coreParser.lexer.GetNextToken()
 			str = value.tokenValue
 		}
 		nv := NewNameValue(name.tokenValue, str)
@@ -73,30 +73,30 @@ func (this *CoreParser) NameValue(separator byte) (nv *NameValue, ParseException
 	}
 }
 
-func (this *CoreParser) Dbg_enter(rule string) {
+func (coreParser *CoreParser) Dbg_enter(rule string) {
 	var stringBuffer bytes.Buffer
-	for i := 0; i < this.nesting_level; i++ {
+	for i := 0; i < coreParser.nesting_level; i++ {
 		stringBuffer.WriteString(">")
 	}
 	if Debug.ParserDebug {
-		println(stringBuffer.String() + rule + "\nlexer buffer = \n" + this.lexer.GetRest())
+		println(stringBuffer.String() + rule + "\nlexer buffer = \n" + coreParser.lexer.GetRest())
 	}
-	this.nesting_level++
+	coreParser.nesting_level++
 }
 
-func (this *CoreParser) Dbg_leave(rule string) {
+func (coreParser *CoreParser) Dbg_leave(rule string) {
 	var stringBuffer bytes.Buffer
-	for i := 0; i < this.nesting_level; i++ {
+	for i := 0; i < coreParser.nesting_level; i++ {
 		stringBuffer.WriteString("<")
 	}
 	if Debug.ParserDebug {
-		println(stringBuffer.String() + rule + "\nlexer buffer = \n" + this.lexer.GetRest())
+		println(stringBuffer.String() + rule + "\nlexer buffer = \n" + coreParser.lexer.GetRest())
 	}
-	this.nesting_level--
+	coreParser.nesting_level--
 }
 
-func (this *CoreParser) PeekLine(rule string) {
+func (coreParser *CoreParser) PeekLine(rule string) {
 	if Debug.ParserDebug {
-		Debug.println(rule + " " + this.lexer.PeekLine())
+		Debug.println(rule + " " + coreParser.lexer.PeekLine())
 	}
 }

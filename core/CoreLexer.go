@@ -64,95 +64,95 @@ type CoreLexer struct {
 }
 
 func NewCoreLexer(lexerName string, buffer string) *CoreLexer {
-	this := &CoreLexer{}
+	coreLexer := &CoreLexer{}
 
-	this.StringTokenizer.super(buffer)
+	coreLexer.StringTokenizer.super(buffer)
 
-	this.globalSymbolTable = make(map[int]string)
-	this.lexerTables = make(map[string]LexerMap)
-	this.currentLexer = make(LexerMap)
-	this.currentLexerName = lexerName
+	coreLexer.globalSymbolTable = make(map[int]string)
+	coreLexer.lexerTables = make(map[string]LexerMap)
+	coreLexer.currentLexer = make(LexerMap)
+	coreLexer.currentLexerName = lexerName
 
-	return this
+	return coreLexer
 }
 
-func (this *CoreLexer) Super(lexerName, buffer string) {
-	this.StringTokenizer.super(buffer)
+func (coreLexer *CoreLexer) Super(lexerName, buffer string) {
+	coreLexer.StringTokenizer.super(buffer)
 
-	this.globalSymbolTable = make(map[int]string)
-	this.lexerTables = make(map[string]LexerMap)
-	this.currentLexer = make(LexerMap)
-	this.currentLexerName = lexerName
+	coreLexer.globalSymbolTable = make(map[int]string)
+	coreLexer.lexerTables = make(map[string]LexerMap)
+	coreLexer.currentLexer = make(LexerMap)
+	coreLexer.currentLexerName = lexerName
 }
 
-func (this *CoreLexer) SetLexerName(lexerName string) {
-	this.currentLexerName = lexerName
+func (coreLexer *CoreLexer) SetLexerName(lexerName string) {
+	coreLexer.currentLexerName = lexerName
 }
 
-func (this *CoreLexer) GetLexerName() string {
-	return this.currentLexerName
+func (coreLexer *CoreLexer) GetLexerName() string {
+	return coreLexer.currentLexerName
 }
 
-func (this *CoreLexer) AddKeyword(name string, value int) {
-	this.currentLexer[name] = value
-	if _, ok := this.globalSymbolTable[value]; !ok {
-		this.globalSymbolTable[value] = name
+func (coreLexer *CoreLexer) AddKeyword(name string, value int) {
+	coreLexer.currentLexer[name] = value
+	if _, ok := coreLexer.globalSymbolTable[value]; !ok {
+		coreLexer.globalSymbolTable[value] = name
 	}
 }
 
-func (this *CoreLexer) LookupToken(value int) string {
+func (coreLexer *CoreLexer) LookupToken(value int) string {
 	if value > CORELEXER_START {
-		return this.globalSymbolTable[value]
+		return coreLexer.globalSymbolTable[value]
 	} else {
 		return strconv.Itoa(value)
 	}
 }
 
-func (this *CoreLexer) AddLexer(lexerName string) LexerMap {
+func (coreLexer *CoreLexer) AddLexer(lexerName string) LexerMap {
 	var ok bool
-	this.currentLexer, ok = this.lexerTables[lexerName]
+	coreLexer.currentLexer, ok = coreLexer.lexerTables[lexerName]
 	if !ok {
-		this.currentLexer = make(LexerMap)
-		this.lexerTables[lexerName] = this.currentLexer
+		coreLexer.currentLexer = make(LexerMap)
+		coreLexer.lexerTables[lexerName] = coreLexer.currentLexer
 	}
-	return this.currentLexer
+	return coreLexer.currentLexer
 }
 
-func (this *CoreLexer) SelectLexer(lexerName string) {
-	this.currentLexer = this.lexerTables[lexerName]
-	this.currentLexerName = lexerName
+func (coreLexer *CoreLexer) SelectLexer(lexerName string) {
+	coreLexer.currentLexer = coreLexer.lexerTables[lexerName]
+	coreLexer.currentLexerName = lexerName
 }
 
-func (this *CoreLexer) CurrentLexer() LexerMap {
-	return this.currentLexer
+func (coreLexer *CoreLexer) CurrentLexer() LexerMap {
+	return coreLexer.currentLexer
 }
 
 /** Peek the next id but dont move the buffer pointer forward.
  */
-func (this *CoreLexer) PeekNextId() string {
-	oldPtr := this.ptr
-	retval := this.Ttoken()
-	this.savedPtr = this.ptr
-	this.ptr = oldPtr
+func (coreLexer *CoreLexer) PeekNextId() string {
+	oldPtr := coreLexer.ptr
+	retval := coreLexer.Ttoken()
+	coreLexer.savedPtr = coreLexer.ptr
+	coreLexer.ptr = oldPtr
 	return retval
 }
 
 /** Get the next id.
  */
-func (this *CoreLexer) GetNextId() string {
-	return this.Ttoken()
+func (coreLexer *CoreLexer) GetNextId() string {
+	return coreLexer.Ttoken()
 }
 
-// call this after you call match
-func (this *CoreLexer) GetNextToken() *Token {
-	return this.currentMatch
+// call coreLexer after you call match
+func (coreLexer *CoreLexer) GetNextToken() *Token {
+	return coreLexer.currentMatch
 
 }
 
 /** Look ahead for one token.
  */
-func (this *CoreLexer) PeekNextToken() (*Token, error) {
-	tok, err := this.PeekNextTokenK(1)
+func (coreLexer *CoreLexer) PeekNextToken() (*Token, error) {
+	tok, err := coreLexer.PeekNextTokenK(1)
 	if err != nil {
 		return nil, err
 	} else {
@@ -160,29 +160,29 @@ func (this *CoreLexer) PeekNextToken() (*Token, error) {
 	}
 }
 
-func (this *CoreLexer) PeekNextTokenK(ntokens int) ([]*Token, error) {
-	old := this.ptr
+func (coreLexer *CoreLexer) PeekNextTokenK(ntokens int) ([]*Token, error) {
+	old := coreLexer.ptr
 	retval := make([]*Token, ntokens)
 	var err error
 	for i := 0; i < ntokens; i++ {
 		tok := &Token{}
-		if this.StartsId() {
-			id := this.Ttoken()
+		if coreLexer.StartsId() {
+			id := coreLexer.Ttoken()
 			tok.tokenValue = id
-			if _, ok := this.currentLexer[strings.ToUpper(id)]; ok {
-				tok.tokenType = this.currentLexer[strings.ToUpper(id)]
+			if _, ok := coreLexer.currentLexer[strings.ToUpper(id)]; ok {
+				tok.tokenType = coreLexer.currentLexer[strings.ToUpper(id)]
 			} else {
 				tok.tokenType = CORELEXER_ID
 			}
 		} else {
-			nextChar, err := this.GetNextChar()
+			nextChar, err := coreLexer.GetNextChar()
 			if err != nil {
 				break
 			}
 			tok.tokenValue += string(nextChar)
-			if this.IsAlpha(nextChar) {
+			if coreLexer.IsAlpha(nextChar) {
 				tok.tokenType = CORELEXER_ALPHA
-			} else if this.IsDigit(nextChar) {
+			} else if coreLexer.IsDigit(nextChar) {
 				tok.tokenType = CORELEXER_DIGIT
 			} else {
 				tok.tokenType = (int)(nextChar)
@@ -190,95 +190,95 @@ func (this *CoreLexer) PeekNextTokenK(ntokens int) ([]*Token, error) {
 		}
 		retval[i] = tok
 	}
-	this.savedPtr = this.ptr
-	this.ptr = old
+	coreLexer.savedPtr = coreLexer.ptr
+	coreLexer.ptr = old
 	return retval, err
 }
 
 /** Match the given token or throw an exception if no such token
  * can be matched.
  */
-func (this *CoreLexer) Match(tok int) (t *Token, ParseException error) {
+func (coreLexer *CoreLexer) Match(tok int) (t *Token, ParseException error) {
 	if Debug.ParserDebug {
 		Debug.println("match " + strconv.Itoa(tok))
 	}
 	if tok > CORELEXER_START && tok < CORELEXER_END {
 		if tok == CORELEXER_ID {
 			// Generic ID sought.
-			if !this.StartsId() {
+			if !coreLexer.StartsId() {
 				return nil, errors.New("ParseException: ID expected")
 			}
-			id := this.GetNextId()
-			this.currentMatch = &Token{}
-			this.currentMatch.tokenValue = id
-			this.currentMatch.tokenType = CORELEXER_ID
+			id := coreLexer.GetNextId()
+			coreLexer.currentMatch = &Token{}
+			coreLexer.currentMatch.tokenValue = id
+			coreLexer.currentMatch.tokenType = CORELEXER_ID
 		} else {
-			nexttok := this.GetNextId()
-			cur, ok := this.currentLexer[strings.ToUpper(nexttok)]
+			nexttok := coreLexer.GetNextId()
+			cur, ok := coreLexer.currentLexer[strings.ToUpper(nexttok)]
 			if !ok || cur != tok {
 				return nil, errors.New("ParseException: Unexpected Token")
 			}
-			this.currentMatch = &Token{}
-			this.currentMatch.tokenValue = nexttok
-			this.currentMatch.tokenType = tok
+			coreLexer.currentMatch = &Token{}
+			coreLexer.currentMatch.tokenValue = nexttok
+			coreLexer.currentMatch.tokenType = tok
 		}
 	} else if tok > CORELEXER_END {
 		// Character classes.
-		next, err := this.LookAheadK(0)
+		next, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			return nil, errors.New("ParseException: Expecting DIGIT")
 		}
 		if tok == CORELEXER_DIGIT {
-			if !this.IsDigit(next) {
+			if !coreLexer.IsDigit(next) {
 				return nil, errors.New("ParseException: Expecting DIGIT")
 			}
-			this.currentMatch = &Token{}
-			this.currentMatch.tokenValue = string(next)
-			this.currentMatch.tokenType = tok
-			this.ConsumeK(1)
+			coreLexer.currentMatch = &Token{}
+			coreLexer.currentMatch.tokenValue = string(next)
+			coreLexer.currentMatch.tokenType = tok
+			coreLexer.ConsumeK(1)
 		} else if tok == CORELEXER_ALPHA {
-			if !this.IsAlpha(next) {
+			if !coreLexer.IsAlpha(next) {
 				return nil, errors.New("ParseException: Expecting ALPHA")
 			}
-			this.currentMatch = &Token{}
-			this.currentMatch.tokenValue = string(next)
-			this.currentMatch.tokenType = tok
-			this.ConsumeK(1)
+			coreLexer.currentMatch = &Token{}
+			coreLexer.currentMatch.tokenValue = string(next)
+			coreLexer.currentMatch.tokenType = tok
+			coreLexer.ConsumeK(1)
 		}
 	} else {
 		// This is a direct character spec.
 		ch := byte(tok)
-		next, err := this.LookAheadK(0)
+		next, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			return nil, errors.New("ParseException: Expecting DIGIT")
 		}
 		if next == ch {
-			this.currentMatch = &Token{}
-			this.currentMatch.tokenValue = string(ch)
-			this.currentMatch.tokenType = tok
-			this.ConsumeK(1)
+			coreLexer.currentMatch = &Token{}
+			coreLexer.currentMatch.tokenValue = string(ch)
+			coreLexer.currentMatch.tokenType = tok
+			coreLexer.ConsumeK(1)
 		} else {
 			return nil, errors.New("ParseException: Expecting")
 		}
 	}
-	return this.currentMatch, nil
+	return coreLexer.currentMatch, nil
 }
 
-func (this *CoreLexer) SPorHT() {
+func (coreLexer *CoreLexer) SPorHT() {
 	var ch byte
 
-	for ch, _ = this.LookAheadK(0); ch == ' ' || ch == '\t'; ch, _ = this.LookAheadK(0) {
-		this.ConsumeK(1)
+	for ch, _ = coreLexer.LookAheadK(0); ch == ' ' || ch == '\t'; ch, _ = coreLexer.LookAheadK(0) {
+		coreLexer.ConsumeK(1)
 	}
 }
 
-func (this *CoreLexer) StartsId() bool {
-	nextChar, err := this.LookAheadK(0)
+func (coreLexer *CoreLexer) StartsId() bool {
+	nextChar, err := coreLexer.LookAheadK(0)
 	if err != nil {
 		return false
 	}
-	return (this.IsAlpha(nextChar) ||
-		this.IsDigit(nextChar) ||
+	return (coreLexer.IsAlpha(nextChar) ||
+		coreLexer.IsDigit(nextChar) ||
 		nextChar == '-' ||
 		nextChar == '.' ||
 		nextChar == '!' ||
@@ -291,17 +291,17 @@ func (this *CoreLexer) StartsId() bool {
 		nextChar == '~')
 }
 
-func (this *CoreLexer) Ttoken() string {
+func (coreLexer *CoreLexer) Ttoken() string {
 	var nextId bytes.Buffer
 
-	for this.HasMoreChars() {
-		nextChar, err := this.LookAheadK(0)
+	for coreLexer.HasMoreChars() {
+		nextChar, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			break
 		}
 
-		if this.IsAlpha(nextChar) ||
-			this.IsDigit(nextChar) ||
+		if coreLexer.IsAlpha(nextChar) ||
+			coreLexer.IsDigit(nextChar) ||
 			nextChar == '-' ||
 			nextChar == '.' ||
 			nextChar == '!' ||
@@ -312,7 +312,7 @@ func (this *CoreLexer) Ttoken() string {
 			nextChar == '`' ||
 			nextChar == '\'' ||
 			nextChar == '~' {
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 			nextId.WriteByte(nextChar)
 		} else {
 			break
@@ -321,17 +321,17 @@ func (this *CoreLexer) Ttoken() string {
 	return nextId.String()
 }
 
-func (this *CoreLexer) TtokenAllowSpace() string {
+func (coreLexer *CoreLexer) TtokenAllowSpace() string {
 	var nextId bytes.Buffer
 
-	for this.HasMoreChars() {
-		nextChar, err := this.LookAheadK(0)
+	for coreLexer.HasMoreChars() {
+		nextChar, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			break
 		}
 
-		if this.IsAlpha(nextChar) ||
-			this.IsDigit(nextChar) ||
+		if coreLexer.IsAlpha(nextChar) ||
+			coreLexer.IsDigit(nextChar) ||
 			nextChar == '-' ||
 			nextChar == '.' ||
 			nextChar == '!' ||
@@ -346,7 +346,7 @@ func (this *CoreLexer) TtokenAllowSpace() string {
 			nextChar == '\t' {
 
 			nextId.WriteByte(nextChar)
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 		} else {
 			break
 		}
@@ -355,16 +355,16 @@ func (this *CoreLexer) TtokenAllowSpace() string {
 }
 
 // Assume the cursor is at a quote.
-func (this *CoreLexer) QuotedString() (s string, err error) {
+func (coreLexer *CoreLexer) QuotedString() (s string, err error) {
 	var retval bytes.Buffer
 	var next byte
 
-	if next, err = this.LookAheadK(0); next != '"' || err != nil {
+	if next, err = coreLexer.LookAheadK(0); next != '"' || err != nil {
 		return "", err
 	}
-	this.ConsumeK(1)
+	coreLexer.ConsumeK(1)
 	for {
-		if next, err = this.GetNextChar(); err != nil {
+		if next, err = coreLexer.GetNextChar(); err != nil {
 			break
 		}
 		if next == '"' {
@@ -374,7 +374,7 @@ func (this *CoreLexer) QuotedString() (s string, err error) {
 			// 	return "", errors.New("ParseException: unexpected EOL")
 		} else if next == '\\' {
 			retval.WriteByte(next)
-			next, _ = this.GetNextChar()
+			next, _ = coreLexer.GetNextChar()
 			retval.WriteByte(next)
 		} else {
 			retval.WriteByte(next)
@@ -384,16 +384,16 @@ func (this *CoreLexer) QuotedString() (s string, err error) {
 }
 
 // Assume the cursor is at a "("
-func (this *CoreLexer) Comment() (s string, err error) {
+func (coreLexer *CoreLexer) Comment() (s string, err error) {
 	var retval bytes.Buffer
 	var next byte
 
-	if next, err = this.LookAheadK(0); next != '(' || err != nil {
+	if next, err = coreLexer.LookAheadK(0); next != '(' || err != nil {
 		return "", err
 	}
-	this.ConsumeK(1)
+	coreLexer.ConsumeK(1)
 	for {
-		if next, err = this.GetNextChar(); err != nil {
+		if next, err = coreLexer.GetNextChar(); err != nil {
 			break
 		}
 		if next == ')' {
@@ -402,7 +402,7 @@ func (this *CoreLexer) Comment() (s string, err error) {
 			// 	return "", errors.New("ParseException: unexpected EOL")
 		} else if next == '\\' {
 			retval.WriteByte(next)
-			if next, err = this.GetNextChar(); err != nil {
+			if next, err = coreLexer.GetNextChar(); err != nil {
 				break
 			}
 			// if next == 0 { //'\0'{
@@ -416,18 +416,18 @@ func (this *CoreLexer) Comment() (s string, err error) {
 	return retval.String(), err
 }
 
-func (this *CoreLexer) ByteStringNoSemicolon() string {
+func (coreLexer *CoreLexer) ByteStringNoSemicolon() string {
 	var retval bytes.Buffer
 
 	for {
-		next, err := this.LookAheadK(0)
+		next, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			break
 		}
 		if /*next == 0*/ /*'\0'*/ /*||*/ next == '\n' || next == ';' {
 			break
 		} else {
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 			retval.WriteByte(next)
 		}
 	}
@@ -435,18 +435,18 @@ func (this *CoreLexer) ByteStringNoSemicolon() string {
 	return retval.String()
 }
 
-func (this *CoreLexer) ByteStringNoComma() string {
+func (coreLexer *CoreLexer) ByteStringNoComma() string {
 	var retval bytes.Buffer
 
 	for {
-		next, err := this.LookAheadK(0)
+		next, err := coreLexer.LookAheadK(0)
 		if err != nil {
 			break
 		}
 		if next == '\n' || next == ',' {
 			break
 		} else {
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 			retval.WriteByte(next)
 		}
 	}
@@ -454,7 +454,7 @@ func (this *CoreLexer) ByteStringNoComma() string {
 	return retval.String()
 }
 
-func (this *CoreLexer) CharAsString(ch byte) string {
+func (coreLexer *CoreLexer) CharAsString(ch byte) string {
 	var retval bytes.Buffer
 	retval.WriteByte(ch)
 	return retval.String()
@@ -463,11 +463,11 @@ func (this *CoreLexer) CharAsString(ch byte) string {
 /** Lookahead in the inputBuffer for n chars and return as a string.
  * Do not consume the input.
  */
-func (this *CoreLexer) NCharAsString(nchars int) string {
+func (coreLexer *CoreLexer) NCharAsString(nchars int) string {
 	var retval bytes.Buffer
 
 	for i := 0; i < nchars; i++ {
-		next, err := this.LookAheadK(i)
+		next, err := coreLexer.LookAheadK(i)
 		if err != nil {
 			break
 		}
@@ -479,24 +479,24 @@ func (this *CoreLexer) NCharAsString(nchars int) string {
 
 /** Get and consume the next number.
  */
-func (this *CoreLexer) Number() (n int, ParseException error) {
+func (coreLexer *CoreLexer) Number() (n int, ParseException error) {
 	var retval bytes.Buffer
 
-	next, err := this.LookAheadK(0)
+	next, err := coreLexer.LookAheadK(0)
 	if err != nil {
 		return -1, err
 	}
-	if !this.IsDigit(next) {
+	if !coreLexer.IsDigit(next) {
 		return -1, errors.New("ParseException: unexpected token \"" + string(next) + "\"")
 	}
 
 	retval.WriteByte(next)
-	this.ConsumeK(1)
+	coreLexer.ConsumeK(1)
 	for {
-		next, err := this.LookAheadK(0)
-		if err == nil && this.IsDigit(next) {
+		next, err := coreLexer.LookAheadK(0)
+		if err == nil && coreLexer.IsDigit(next) {
 			retval.WriteByte(next)
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 		} else {
 			break
 		}
@@ -511,59 +511,59 @@ func (this *CoreLexer) Number() (n int, ParseException error) {
 
 /** Mark the position for backtracking.
  */
-func (this *CoreLexer) MarkInputPosition() int {
-	return this.ptr
+func (coreLexer *CoreLexer) MarkInputPosition() int {
+	return coreLexer.ptr
 }
 
 /** Rewind the input ptr to the marked position.
  */
-func (this *CoreLexer) RewindInputPosition(position int) {
-	this.ptr = position
+func (coreLexer *CoreLexer) RewindInputPosition(position int) {
+	coreLexer.ptr = position
 }
 
 /** Get the rest of the String
  * @return String
  */
-func (this *CoreLexer) GetRest() string {
-	if this.ptr >= len(this.buffer) {
+func (coreLexer *CoreLexer) GetRest() string {
+	if coreLexer.ptr >= len(coreLexer.buffer) {
 		return ""
 	} else {
-		return this.buffer[this.ptr:]
+		return coreLexer.buffer[coreLexer.ptr:]
 	}
 }
 
 /** Get the sub-String until the character is encountered.
- * Acknowledgement - Sylvian Corre submitted a bug fix for this
+ * Acknowledgement - Sylvian Corre submitted a bug fix for coreLexer
  * method.
  * @param char c the character to match
  * @return matching string.
  */
-func (this *CoreLexer) GetString(c byte) (s string, err error) {
-	var savedPtr int = this.ptr
+func (coreLexer *CoreLexer) GetString(c byte) (s string, err error) {
+	var savedPtr int = coreLexer.ptr
 	var retval bytes.Buffer
 	var next byte
 
 	for {
-		next, err = this.LookAheadK(0)
+		next, err = coreLexer.LookAheadK(0)
 
 		if err != nil /*next == 0*/ { //'\0'
-			this.ptr = savedPtr
+			coreLexer.ptr = savedPtr
 			break //return "", errors.New("ParseException: unexpected EOL")
 		} else if next == c {
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 			break
 		} else if next == '\\' {
-			this.ConsumeK(1)
-			next, err = this.LookAheadK(0)
+			coreLexer.ConsumeK(1)
+			next, err = coreLexer.LookAheadK(0)
 			if err != nil /*nextchar == 0*/ { //'\0'  {
-				this.ptr = savedPtr
+				coreLexer.ptr = savedPtr
 				break //return "", errors.New("ParseException: unexpected EOL")
 			} else {
-				this.ConsumeK(1)
+				coreLexer.ConsumeK(1)
 				retval.WriteByte(next)
 			}
 		} else {
-			this.ConsumeK(1)
+			coreLexer.ConsumeK(1)
 			retval.WriteByte(next)
 		}
 	}
@@ -572,12 +572,12 @@ func (this *CoreLexer) GetString(c byte) (s string, err error) {
 
 /** Get the read pointer.
  */
-func (this *CoreLexer) GetPtr() int {
-	return this.ptr
+func (coreLexer *CoreLexer) GetPtr() int {
+	return coreLexer.ptr
 }
 
 /** Get the buffer.
  */
-func (this *CoreLexer) GetBuffer() string {
-	return this.buffer
+func (coreLexer *CoreLexer) GetBuffer() string {
+	return coreLexer.buffer
 }

@@ -25,23 +25,23 @@ type HostPort struct {
 /** Default constructor
  */
 func NewHostPort() *HostPort {
-	this := &HostPort{} // marker for not set.
-	this.port = -1
-	return this
+	hostPort := &HostPort{} // marker for not set.
+	hostPort.port = -1
+	return hostPort
 }
 
 /**
- * Encode this hostport into its string representation.
- * Note that this could be different from the string that has
+ * Encode hostPort hostport into its string representation.
+ * Note that hostPort could be different from the string that has
  * been parsed if something has been edited.
  * @return String
  */
-func (this *HostPort) String() string {
+func (hostPort *HostPort) String() string {
 	var retval bytes.Buffer //= new StringBuffer();
-	if this.host != nil {
-		retval.WriteString(this.host.String())
-		if this.port != -1 {
-			retval.WriteString(SIPSeparatorNames_COLON + strconv.Itoa(this.port))
+	if hostPort.host != nil {
+		retval.WriteString(hostPort.host.String())
+		if hostPort.port != -1 {
+			retval.WriteString(SIPSeparatorNames_COLON + strconv.Itoa(hostPort.port))
 		}
 	}
 	return retval.String()
@@ -52,81 +52,81 @@ func (this *HostPort) String() string {
  * @return boolean
  */
 /*public boolean equals(Object other) {
-            if (! this.getClass().equals(other.getClass())) {
+            if (! hostPort.getClass().equals(other.getClass())) {
                 return false;
             }
             HostPort that = (HostPort) other;
-	    if ( (this.port == null && that.port != null) ||
-		 (this.port != null && that.port == null) ) return false;
-	    else if (this.port == that.port && this.host.equals(that.host))
+	    if ( (hostPort.port == null && that.port != null) ||
+		 (hostPort.port != null && that.port == null) ) return false;
+	    else if (hostPort.port == that.port && hostPort.host.equals(that.host))
 		return true;
 	    else
-              return this.host.equals(that.host) && this.port.equals(that.port);
+              return hostPort.host.equals(that.host) && hostPort.port.equals(that.port);
         }*/
 
 /** get the Host field
  * @return host field
  */
-func (this *HostPort) GetHost() *Host {
-	return this.host
+func (hostPort *HostPort) GetHost() *Host {
+	return hostPort.host
 }
 
 /** get the port field
  * @return int
  */
-func (this *HostPort) GetPort() int {
-	return this.port
+func (hostPort *HostPort) GetPort() int {
+	return hostPort.port
 }
 
 /**
  * Returns boolean value indicating if Header has port
  * @return boolean value indicating if Header has port
  */
-func (this *HostPort) HasPort() bool {
-	return this.port != -1
+func (hostPort *HostPort) HasPort() bool {
+	return hostPort.port != -1
 }
 
 /** remove port.
  */
-func (this *HostPort) RemovePort() {
-	this.port = -1
+func (hostPort *HostPort) RemovePort() {
+	hostPort.port = -1
 }
 
 /**
  * Set the host member
  * @param h Host to set
  */
-func (this *HostPort) SetHost(h *Host) {
-	this.host = h
+func (hostPort *HostPort) SetHost(h *Host) {
+	hostPort.host = h
 }
 
 /**
  * Set the port member
  * @param p int to set
  */
-func (this *HostPort) SetPort(p int) {
+func (hostPort *HostPort) SetPort(p int) {
 	// -1 is same as remove port.
-	this.port = p
+	hostPort.port = p
 }
 
 /** Return the internet address corresponding to the host.
  *@throws java.net.UnkownHostException if host name cannot be resolved.
  *@return the inet address for the host.
  */
-func (this *HostPort) GetInetAddress() net.IP {
-	if this.host == nil {
+func (hostPort *HostPort) GetInetAddress() net.IP {
+	if hostPort.host == nil {
 		return nil
 	}
-	return net.ParseIP(this.host.GetHostName())
+	return net.ParseIP(hostPort.host.GetHostName())
 }
 
-func (this *HostPort) Clone() interface{} {
+func (hostPort *HostPort) Clone() interface{} {
 	retval := &HostPort{}
-	if this.host != nil {
-		retval.host = this.host.Clone().(*Host)
+	if hostPort.host != nil {
+		retval.host = hostPort.host.Clone().(*Host)
 	} else {
 		retval.host = nil
 	}
-	retval.port = this.port
+	retval.port = hostPort.port
 	return retval
 }
