@@ -9,7 +9,7 @@
 package sip
 
 import (
-	"github.com/sssgun/gosips/sip/message"
+	"github.com/use-go/gosips/sip/message"
 )
 
 /**

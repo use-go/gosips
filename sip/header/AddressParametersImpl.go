@@ -1,7 +1,7 @@
 package header
 
 import (
-	"github.com/sssgun/gosips/sip/address"
+	"github.com/use-go/gosips/sip/address"
 )
 
 /** An abstract class for headers that take an address and parameters.

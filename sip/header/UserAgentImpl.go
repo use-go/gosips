@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
-	"github.com/sssgun/gosips/core"
+	"github.com/use-go/gosips/core"
 )
 
 /**

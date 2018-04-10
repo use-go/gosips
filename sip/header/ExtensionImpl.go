@@ -1,7 +1,7 @@
 package header
 
 import (
-	"github.com/sssgun/gosips/core"
+	"github.com/use-go/gosips/core"
 	"strings"
 )
 

@@ -1,6 +1,6 @@
 package header
 
-import "github.com/sssgun/gosips/sip/address"
+import "github.com/use-go/gosips/sip/address"
 
 /**
  * The Authorization header is used when a user agent wishes to authenticate

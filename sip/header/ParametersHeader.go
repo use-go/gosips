@@ -2,7 +2,7 @@ package header
 
 import (
 	"container/list"
-	"github.com/sssgun/gosips/core"
+	"github.com/use-go/gosips/core"
 )
 
 type ParametersHeader interface {

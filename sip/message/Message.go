@@ -2,7 +2,7 @@ package message
 
 import (
 	"container/list"
-	"github.com/sssgun/gosips/sip/header"
+	"github.com/use-go/gosips/sip/header"
 )
 
 /**

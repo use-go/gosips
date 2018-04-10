@@ -10,7 +10,7 @@ package sip
 
 import (
 	"container/list"
-	"github.com/sssgun/gosips/sip/message"
+	"github.com/use-go/gosips/sip/message"
 )
 
 /**

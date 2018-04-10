@@ -1,6 +1,6 @@
 package header
 
-import "github.com/sssgun/gosips/core"
+import "github.com/use-go/gosips/core"
 
 /**
 * Proxy Require SIPSIPObject (list of option tags)

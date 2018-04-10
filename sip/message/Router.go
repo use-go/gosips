@@ -4,7 +4,7 @@ package message
 
 import (
 	"container/list"
-	"github.com/sssgun/gosips/sip/address"
+	"github.com/use-go/gosips/sip/address"
 )
 
 /**

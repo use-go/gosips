@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
-	"github.com/sssgun/gosips/core"
-	"github.com/sssgun/gosips/sip/header"
+	"github.com/use-go/gosips/core"
+	"github.com/use-go/gosips/sip/header"
 	"strings"
 )
 

@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"github.com/sssgun/gosips/core"
-	"github.com/sssgun/gosips/sip/header"
+	"github.com/use-go/gosips/core"
+	"github.com/use-go/gosips/sip/header"
 )
 
 /** SIPParser for the challenge portion of the authentication header.

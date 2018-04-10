@@ -3,7 +3,7 @@ package header
 import (
 	"bytes"
 	"container/list"
-	"github.com/sssgun/gosips/core"
+	"github.com/use-go/gosips/core"
 )
 
 type Lister interface {

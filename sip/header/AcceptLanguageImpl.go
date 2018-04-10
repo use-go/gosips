@@ -3,7 +3,7 @@ package header
 import (
 	"bytes"
 	"errors"
-	"github.com/sssgun/gosips/core"
+	"github.com/use-go/gosips/core"
 	"strconv"
 	"strings"
 )

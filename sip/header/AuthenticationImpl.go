@@ -2,8 +2,8 @@ package header
 
 import (
 	"errors"
-	"github.com/sssgun/gosips/core"
-	"github.com/sssgun/gosips/sip/address"
+	"github.com/use-go/gosips/core"
+	"github.com/use-go/gosips/sip/address"
 	"strconv"
 	"strings"
 )
