@@ -7,3 +7,7 @@ The objective of GoSIPs is to develop a Golang stack interface and implementatio
 
 GoSIPs is still in heavy development stage. Currently, SIP Message Parser/Encoder is almost done, but it still need more polish and torture-test.
 
+
+## Zero Dependency
+
+no 3rd library used.
