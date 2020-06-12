@@ -1,7 +1,5 @@
 package address
 
-import ()
-
 /**
  * This interface provides factory methods that allow an application to create
  * Address objects, URI's, SipURI's and TelURL's from a particular

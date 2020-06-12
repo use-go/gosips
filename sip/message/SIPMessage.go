@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
+	"strings"
+
 	"github.com/use-go/gosips/core"
 	"github.com/use-go/gosips/sip/header"
-	"strings"
 )
 
 /**
