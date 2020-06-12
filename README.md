@@ -12,6 +12,6 @@ GoSIPs is still in heavy development stage. Currently, SIP Message Parser/Encode
 
 no 3rd library used.
 
-# Enhanced from
+### Fork and Enhanced from
 
 [rainliu/gosips](https://github.com/rainliu/gosips)
