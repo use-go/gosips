@@ -11,3 +11,7 @@ GoSIPs is still in heavy development stage. Currently, SIP Message Parser/Encode
 ## Zero Dependency
 
 no 3rd library used.
+
+# Enhanced from
+
+[rainliu/gosips](https://github.com/rainliu/gosips)
