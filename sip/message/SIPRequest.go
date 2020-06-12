@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
+	"strings"
+
 	"github.com/use-go/gosips/core"
 	"github.com/use-go/gosips/sip/address"
 	"github.com/use-go/gosips/sip/header"
-	"strings"
 )
 
 const DEFAULT_USER = "ip"
@@ -255,7 +256,8 @@ func (this *SIPRequest) String() string {
 	} else {
 		retval = this.SIPMessage.String()
 	}
-	return retval + core.SIPSeparatorNames_NEWLINE
+	//return retval + core.SIPSeparatorNames_NEWLINE
+	return retval
 }
 
 // /** ALias for encode above.
